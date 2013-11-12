@@ -8,6 +8,7 @@ package
 	import lzm.starling.swf.Swf;
 	
 	import starling.core.Starling;
+	import starling.display.Image;
 	import starling.display.Sprite;
 	import starling.text.TextField;
 	import starling.utils.AssetManager;
@@ -38,7 +39,10 @@ package
 				if(ratio == 1){
 					textfield.removeFromParent(true);
 					
-					var swf:Swf = new Swf(assets.getByteArray("layout"),assets);
+					var swf:Swf = new Swf(assets.getByteArray("test"),assets);
+					
+					var image:Image = swf.createImage("img_big_test");
+					addChild(image);
 					
 					var sprite:Sprite = swf.createSprite("spr_1");
 					addChild(sprite);

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<comps>
+	<Window id="window" title="导出选项" hasCloseButton="true" draggable="false" width="368" height="148" event="close:onClose">
+		<VBox x="12" y="8">
+			<HBox>
+				<Label text="导出倍数:"/>
+				<NumericStepper id="exportScale" value="1" minimum="1"/>
+			</HBox>
+			<HBox>
+				<Label text="合并纹理:"/>
+				<CheckBox id="isMerger" selected="true"/>
+			</HBox>
+			<HBox>
+				<Label text="纹理间距:"/>
+				<NumericStepper id="paddingValue" value="2" minimum="1"/>
+			</HBox>
+			<HBox>
+				<Label text="是否将大图合并到纹理中:"/>
+				<HBox>
+					<CheckBox id="isMergerBigImage" selected="false"/>
+					<Label text="(图片尺寸大于150*150算作大图)"/>
+				</HBox>
+			</HBox>
+			<PushButton id="exportBtn" label="导出" event="click:onExport"/>
+		</VBox>
+	</Window>
+</comps>

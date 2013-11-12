@@ -4,7 +4,6 @@ package lzm.starling.swf.tool.ui
 	import com.bit101.components.ComboBox;
 	import com.bit101.components.HUISlider;
 	import com.bit101.components.InputText;
-	import com.bit101.components.NumericStepper;
 	import com.bit101.components.PushButton;
 	
 	import flash.display.BitmapData;
@@ -15,6 +14,7 @@ package lzm.starling.swf.tool.ui
 	import flash.filesystem.File;
 	import flash.filesystem.FileMode;
 	import flash.filesystem.FileStream;
+	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.net.FileFilter;
 	import flash.net.URLRequest;
@@ -26,6 +26,7 @@ package lzm.starling.swf.tool.ui
 	import lzm.starling.swf.tool.utils.ImageUtil;
 	import lzm.starling.swf.tool.utils.MovieClipUtil;
 	import lzm.starling.swf.tool.utils.SpriteUtil;
+	import lzm.starling.swf.tool.utils.TextureUtil;
 	import lzm.starling.swf.tool.utils.Util;
 	
 	import starling.core.Starling;
@@ -53,13 +54,17 @@ package lzm.starling.swf.tool.ui
 		private var _bgColorChooser:ColorChooser;
 		private var _fpsValue:HUISlider;
 		
-		private var _exportScale:NumericStepper;
 		private var _exportBtn:PushButton;
-		private var _exportPath:String;
+		
+		private var _exportOption:ExportUi;
 		
 		public function MainUi()
 		{
 			super();
+			
+			_exportOption = new ExportUi();
+			_exportOption.addEventListener("export",export);
+			
 			loadUi("assets/ui/main.xml");
 		}
 		
@@ -76,7 +81,6 @@ package lzm.starling.swf.tool.ui
 			_bgColorChooser = uiConfig.getCompById("bgColor") as ColorChooser;
 			_fpsValue = uiConfig.getCompById("fpsValue") as HUISlider;
 			
-			_exportScale = uiConfig.getCompById("exportScale") as NumericStepper;
 			_exportBtn = uiConfig.getCompById("exportBtn") as PushButton;
 		}
 		
@@ -125,7 +129,6 @@ package lzm.starling.swf.tool.ui
 			_selectSwfSource.enabled = false;
 			_refreshSwfSource.enabled = true;
 			_exportBtn.enabled = true;
-			_exportScale.enabled = true;
 			
 			Assets.appDomain = loaderinfo.content.loaderInfo.applicationDomain;
 			var clazzKeys:Vector.<String> = Assets.appDomain.getQualifiedDefinitionNames();
@@ -306,64 +309,151 @@ package lzm.starling.swf.tool.ui
 			stage.frameRate = _fpsValue.value;
 		}
 		
-		public function onExport(e:Event):void{
-			var file:File = new File();
-			file.browseForDirectory("输出路径");
-			file.addEventListener(Event.SELECT,selectExportPathOk);
+		public function onExportBtn(e:Event):void{
+			stage.addChild(_exportOption);
 		}
 		
-		/**
-		 * 选择完swf
-		 * */
-		private function selectExportPathOk(e:Event):void{
-			var file:File = e.target as File;
-			file.removeEventListener(Event.SELECT,selectExportPathOk);
-			
+		private function export(e:Event):void{
 			Loading.instance.show();
-			
 			setTimeout(function():void{
-				__export(file.url);
+				__export(_exportOption.exportPath);
 			},30);
 		}
 		
 		private function __export(exportPath:String):void{
+			var swfName:String = Util.getName(_swfPath.text);
 			var imageExportPath:String = exportPath + "/images/";
 			var bigImageExportPath:String = exportPath + "/images/big/";
-			var dataExportPath:String = exportPath + "/data/layout.bytes";
+			var dataExportPath:String = exportPath + "/data/" + swfName + ".bytes";
 			
 			var images:Array = _imageComboBox.items;
 			images = images.concat(_s9ComboBox.items);
 			var length:int = images.length;
 			
-			var exportFile:File;
-			var exportFileStream:FileStream;
-			
 			var bitmapdata:BitmapData;
-			var imageData:ByteArray;
+			var bitmapdatas:Array = [];
+			var bigBitmapDatas:Array = [];
 			
-			for (var i:int = 0; i < length; i++) {
-				bitmapdata = ImageUtil.getBitmapdata(Assets.getClass(images[i]),_exportScale.value);
-				imageData = bitmapdata.encode(new Rectangle(0,0,bitmapdata.width,bitmapdata.height),new PNGEncoderOptions());
-				
-				if(bitmapdata.width > (150 * _exportScale.value) && bitmapdata.height > (150 * _exportScale.value)){
-					exportFile = new File(bigImageExportPath + images[i] + ".png");
-				}else{
-					exportFile = new File(imageExportPath + images[i] + ".png");
-				}
-				
-				try
-				{
-					exportFileStream = new FileStream();
-					exportFileStream.open(exportFile,FileMode.WRITE);
-					exportFileStream.writeBytes(imageData);
-					exportFileStream.close();
-				} 
-				catch(error:Error) 
-				{
-					trace(exportFile.url);
+			var imageNames:Array = [];
+			var bigImageNames:Array = [];
+			var rectMap:Object = {};
+			
+			var i:int;
+			for (i = 0; i < length; i++) {
+				bitmapdata = ImageUtil.getBitmapdata(Assets.getClass(images[i]),_exportOption.exportScale);
+				if(_exportOption.isMerger){//合并纹理
+					if(isBigImage(bitmapdata) && !_exportOption.isMergerBigImage){
+						bigImageNames.push(images[i]);
+						bigBitmapDatas.push(bitmapdata);
+					}else{
+						bitmapdatas.push(bitmapdata);
+						imageNames.push(images[i]);
+						rectMap[images[i]] = new Rectangle(0,0,bitmapdata.width,bitmapdata.height);
+					}
+				}else{//不合并
+					if(isBigImage(bitmapdata)){
+						bigImageNames.push(images[i]);
+						bigBitmapDatas.push(bitmapdata);
+					}else{
+						imageNames.push(images[i]);
+						bitmapdatas.push(bitmapdata);
+					}
 				}
 			}
 			
+			if(_exportOption.isMerger){
+				var textureAtlasRect:Rectangle = TextureUtil.packTextures(0,_exportOption.padding,rectMap);
+				var textureAtlasBitmapData:BitmapData = new BitmapData(textureAtlasRect.width,textureAtlasRect.height,true,0);
+				var xml:XML = <TextureAtlas />;
+				var childXml:XML;
+				var imageName:String;
+				var imageRect:Rectangle;
+				
+				var tempRect:Rectangle = new Rectangle();
+				var tempPoint:Point = new Point();
+				
+				length = imageNames.length;
+				for (i = 0; i < length; i++) {
+					imageName = imageNames[i];
+					imageRect = rectMap[imageName];
+					bitmapdata = bitmapdatas[i];
+					
+					tempRect.width = bitmapdata.width;
+					tempRect.height = bitmapdata.height;
+					tempPoint.x = imageRect.x;
+					tempPoint.y = imageRect.y;
+					
+					childXml = <SubTexture />;
+					childXml.@name = imageName;
+					childXml.@x = tempPoint.x;
+					childXml.@y = tempPoint.y;
+					childXml.@width = tempRect.width;
+					childXml.@height = tempRect.height;
+					xml.appendChild(childXml);
+					
+					textureAtlasBitmapData.copyPixels(bitmapdata,tempRect,tempPoint);
+				}
+				
+				saveImage(imageExportPath + swfName + ".png",textureAtlasBitmapData);
+				
+				xml.@imagePath = swfName + ".png";
+				saveXml(imageExportPath + swfName + ".xml",xml.toXMLString());
+				
+			}else{
+				//小图导出
+				length = imageNames.length;
+				for (i = 0; i < length; i++) {
+					saveImage(imageExportPath + imageNames[i] + ".png",bitmapdatas[i]);
+				}
+			}
+			
+			//大图导出
+			length = bigImageNames.length;
+			for (i = 0; i < length; i++) {
+				saveImage(bigImageExportPath + bigImageNames[i] + ".png",bigBitmapDatas[i]);
+			}
+			
+			//保存swf数据
+			saveSwfDate(dataExportPath);
+			
+			Loading.instance.hide();
+		}
+		
+		//是否是大纹理
+		private function isBigImage(bitmapdata:BitmapData):Boolean{
+			if(bitmapdata.width > (150 * _exportOption.exportScale) && bitmapdata.height > (150 * _exportOption.exportScale)){
+				return true;
+			}
+			return false;
+		}
+		
+		//保存图片
+		private function saveImage(path:String,bitmapdata:BitmapData):void{
+			try{
+				var bytes:ByteArray = bitmapdata.encode(new Rectangle(0,0,bitmapdata.width,bitmapdata.height),new PNGEncoderOptions());
+				var file:File = new File(path);
+				var fs:FileStream = new FileStream();
+				fs.open(file,FileMode.WRITE);
+				fs.writeBytes(bytes);
+				fs.close();
+			} 
+			catch(error:Error) {
+				trace(path);
+			}
+			
+		}
+		//保存xml
+		private function saveXml(path:String,data:String):void{
+			var bytes:ByteArray = new ByteArray();
+			bytes.writeMultiByte(data,"utf-8");
+			var file:File = new File(path);
+			var fs:FileStream = new FileStream();
+			fs.open(file,FileMode.WRITE);
+			fs.writeBytes(bytes);
+			fs.close();
+		}
+		//保存swf数据
+		private function saveSwfDate(dataExportPath:String):void{
 			var swfData:ByteArray = new ByteArray();
 			swfData.writeUTFBytes(JSON.stringify({
 				"img":Assets.imageDatas,
@@ -373,13 +463,11 @@ package lzm.starling.swf.tool.ui
 				"s9":Assets.s9s
 			}));
 			swfData.compress();
-			exportFile = new File(dataExportPath);
-			exportFileStream = new FileStream();
-			exportFileStream.open(exportFile,FileMode.WRITE);
-			exportFileStream.writeBytes(swfData);
-			exportFileStream.close();
-			
-			Loading.instance.hide();
+			var file:File = new File(dataExportPath);
+			var fs:FileStream = new FileStream();
+			fs.open(file,FileMode.WRITE);
+			fs.writeBytes(swfData);
+			fs.close();
 		}
 		
 		
