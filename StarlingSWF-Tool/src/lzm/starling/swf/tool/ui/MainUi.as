@@ -421,7 +421,10 @@ package lzm.starling.swf.tool.ui
 		
 		//是否是大纹理
 		private function isBigImage(bitmapdata:BitmapData):Boolean{
-			if(bitmapdata.width > (150 * _exportOption.exportScale) && bitmapdata.height > (150 * _exportOption.exportScale)){
+			if(
+				bitmapdata.width > (_exportOption.bigImageWidth * _exportOption.exportScale) && 
+				bitmapdata.height > (_exportOption.bigImageHeight * _exportOption.exportScale)
+			){
 				return true;
 			}
 			return false;

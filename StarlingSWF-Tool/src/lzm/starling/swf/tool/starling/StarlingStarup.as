@@ -18,7 +18,6 @@ package lzm.starling.swf.tool.starling
 	
 	import starling.core.Starling;
 	import starling.display.DisplayObject;
-	import starling.display.Image;
 	import starling.display.Shape;
 	import starling.display.Sprite;
 	import starling.events.Event;
