@@ -45,7 +45,7 @@ package lzm.starling.swf.tool.utils
 			
 			Starup.tempContent.addChild(mc);
 			
-			var rect:Rectangle = mc.getRect(Starup.tempContent);
+			var rect:Rectangle = mc.getBounds(Starup.tempContent);
 			
 			Starup.tempContent.removeChild(mc);
 			
