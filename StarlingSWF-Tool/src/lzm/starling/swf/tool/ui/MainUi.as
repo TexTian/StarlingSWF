@@ -306,7 +306,8 @@ package lzm.starling.swf.tool.ui
 		}
 		
 		public function onFpsChange(e:Event):void{
-			stage.frameRate = _fpsValue.value;
+			Assets.swf.fps = _fpsValue.value;
+//			stage.frameRate = _fpsValue.value;
 		}
 		
 		public function onExportBtn(e:Event):void{

@@ -37,7 +37,7 @@
 					<Label text="背景颜色:"/>
 					<ColorChooser id="bgColor" usePopup="true" value="0x999999" event="change:onColorChange" />
 				</HBox>
-				<HUISlider label="帧率:" id="fpsValue" value="60" maximum="60" minimum="24" event="change:onFpsChange"/>
+				<HUISlider label="Swf帧率:" id="fpsValue" value="24" maximum="60" minimum="24" event="change:onFpsChange"/>
 				<PushButton id="exportBtn" label="导出" event="click:onExportBtn" enabled="false"/>
 			</HBox>
 		</VBox>
