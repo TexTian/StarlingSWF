@@ -175,13 +175,13 @@ package lzm.starling.swf.tool.ui
 			}
 			
 			var swfData:ByteArray = new ByteArray();
-			swfData.writeUTFBytes(JSON.stringify({
+			swfData.writeMultiByte(JSON.stringify({
 				"img":Assets.imageDatas,
 				"spr":Assets.spriteDatas,
 				"mc":Assets.movieClipDatas,
 				"btn":Assets.buttons,
 				"s9":Assets.s9s
-			}));
+			}),"utf-8");
 			swfData.compress();
 			Assets.swf = new Swf(swfData,Assets.asset);
 			
@@ -415,7 +415,7 @@ package lzm.starling.swf.tool.ui
 			}
 			
 			//保存swf数据
-			saveSwfDate(dataExportPath);
+			saveSwfData(dataExportPath);
 			
 			Loading.instance.hide();
 		}
@@ -457,15 +457,15 @@ package lzm.starling.swf.tool.ui
 			fs.close();
 		}
 		//保存swf数据
-		private function saveSwfDate(dataExportPath:String):void{
+		private function saveSwfData(dataExportPath:String):void{
 			var swfData:ByteArray = new ByteArray();
-			swfData.writeUTFBytes(JSON.stringify({
+			swfData.writeMultiByte(JSON.stringify({
 				"img":Assets.imageDatas,
 				"spr":Assets.spriteDatas,
 				"mc":Assets.movieClipDatas,
 				"btn":Assets.buttons,
 				"s9":Assets.s9s
-			}));
+			}),"utf-8");
 			swfData.compress();
 			var file:File = new File(dataExportPath);
 			var fs:FileStream = new FileStream();
