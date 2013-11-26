@@ -3,7 +3,7 @@
 	<id>com.lzm.StarlingSwf</id>
 	<filename>StarlingSwf</filename>
 	<name>StarlingSwf</name>
-	<versionNumber>0.0.2</versionNumber>
+	<versionNumber>0.0.3</versionNumber>
 	<initialWindow>
 		<content>StarlingSWF_Tool.swf</content>
 		<!-- <systemChrome></systemChrome> -->
