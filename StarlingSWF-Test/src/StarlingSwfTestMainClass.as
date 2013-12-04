@@ -6,6 +6,7 @@ package
 	import lzm.starling.STLMainClass;
 	import lzm.starling.gestures.DragGestures;
 	import lzm.starling.swf.Swf;
+	import lzm.starling.swf.display.SwfMovieClip;
 	
 	import starling.core.Starling;
 	import starling.display.Image;
@@ -18,6 +19,7 @@ package
 	{
 		
 		private var textfield:TextField;
+		private var assets:AssetManager;
 		
 		public function StarlingSwfTestMainClass()
 		{
@@ -30,7 +32,7 @@ package
 			textfield.y = (STLConstant.StageHeight - textfield.height)/2;
 			addChild(textfield);
 			
-			var assets:AssetManager = new AssetManager(STLConstant.scale,STLConstant.useMipMaps);
+			assets = new AssetManager(STLConstant.scale,STLConstant.useMipMaps);
 			var file:File = File.applicationDirectory;
 			
 			assets.enqueue(file.resolvePath(formatString("assets/{0}x/",STLConstant.scale)));
@@ -39,17 +41,32 @@ package
 				if(ratio == 1){
 					textfield.removeFromParent(true);
 					
-					var swf:Swf = new Swf(assets.getByteArray("test"),assets);
-					
-					var image:Image = swf.createImage("img_big_test");
-					addChild(image);
-					
-					var sprite:Sprite = swf.createSprite("spr_1");
-					addChild(sprite);
-					
-					new DragGestures(sprite);
+					test2();
 				}
 			});
+		}
+		
+		private function test1():void{
+			var swf:Swf = new Swf(assets.getByteArray("test"),assets,60);
+			
+			var image:Image = swf.createImage("img_big_test");
+			addChild(image);
+			
+			var sprite:Sprite = swf.createSprite("spr_1");
+			addChild(sprite);
+			
+			new DragGestures(sprite);
+		}
+		
+		private function test2():void{
+			var swf:Swf = new Swf(assets.getByteArray("test"),assets,60);
+			for (var i:int = 0; i < 100; i++) {
+				var mc:SwfMovieClip = swf.createMovieClip("mc_Zombie_gargantuar");
+				mc.scaleX = mc.scaleY = 0.3;
+				mc.x = 50 + Math.random() * 400;
+				mc.y = 50 + Math.random() * 300;
+				addChild(mc);
+			}
 		}
 	}
 }
