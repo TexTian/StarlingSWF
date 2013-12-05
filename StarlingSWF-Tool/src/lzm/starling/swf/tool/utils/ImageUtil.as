@@ -29,6 +29,15 @@ package lzm.starling.swf.tool.utils
 			mc.x = -rect.x;
 			mc.y = -rect.y;
 			
+			var addWidth:Number = Math.abs((mc.x%1) + (rect.width%1));
+			var addHeight:Number = Math.abs((mc.y%1) + (rect.height%1));
+			
+			addWidth = (addWidth%1) > 0 ? int(addWidth+1) : addWidth;
+			addHeight = (addHeight%1) > 0 ? int(addHeight+1) : addHeight;
+			
+			rect.width += addWidth;
+			rect.height += addHeight;
+			
 			var bitmapdata:BitmapData = new BitmapData(rect.width,rect.height,true,0);
 			bitmapdata.draw(Starup.tempContent);
 			

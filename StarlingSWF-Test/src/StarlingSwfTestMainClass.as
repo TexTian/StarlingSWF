@@ -41,7 +41,7 @@ package
 				if(ratio == 1){
 					textfield.removeFromParent(true);
 					
-					test2();
+					test1();
 				}
 			});
 		}
@@ -60,11 +60,10 @@ package
 		
 		private function test2():void{
 			var swf:Swf = new Swf(assets.getByteArray("test"),assets,60);
-			for (var i:int = 0; i < 100; i++) {
-				var mc:SwfMovieClip = swf.createMovieClip("mc_Zombie_gargantuar");
-				mc.scaleX = mc.scaleY = 0.3;
-				mc.x = 50 + Math.random() * 400;
-				mc.y = 50 + Math.random() * 300;
+			for (var i:int = 0; i < 50; i++) {
+				var mc:SwfMovieClip = swf.createMovieClip("mc_Zombie_imp");
+				mc.x = Math.random() * STLConstant.StageWidth - 46;
+				mc.y = Math.random() * STLConstant.StageHeight - 63;
 				addChild(mc);
 			}
 		}
