@@ -30,8 +30,8 @@
           <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/automation_agent.swc" useDefaultLinkType="false"/>
         </excludedEntries>
       </libraryPathEntry>
-      <libraryPathEntry kind="3" linkType="1" path="/StarlingFeathers20131016/bin/StarlingFeathers20131016.swc" useDefaultLinkType="false"/>
       <libraryPathEntry kind="3" linkType="1" path="libs/UIExportFLA.swc" useDefaultLinkType="false"/>
+      <libraryPathEntry kind="3" linkType="1" path="/StarlingFeathers20131209/bin/StarlingFeathers20131209.swc" useDefaultLinkType="false"/>
     </libraryPath>
     <sourceAttachmentPath/>
   </compiler>
