@@ -25,6 +25,7 @@ package lzm.starling.swf.tool.ui
 	import lzm.starling.swf.tool.asset.Assets;
 	import lzm.starling.swf.tool.utils.ImageUtil;
 	import lzm.starling.swf.tool.utils.MovieClipUtil;
+	import lzm.starling.swf.tool.utils.Scale9Util;
 	import lzm.starling.swf.tool.utils.SpriteUtil;
 	import lzm.starling.swf.tool.utils.TextureUtil;
 	import lzm.starling.swf.tool.utils.Util;
@@ -168,7 +169,7 @@ package lzm.starling.swf.tool.ui
 					Assets.buttons[clazzName] = SpriteUtil.getSpriteInfo(Assets.getClass(clazzName));
 					buttons.push(clazzName);
 				}else if(Util.getChildType(clazzName) == Swf.dataKey_Scale9){
-					Assets.s9s[clazzName] = "";
+					Assets.s9s[clazzName] = Scale9Util.getScale9Info(Assets.getClass(clazzName));
 					Assets.asset.addTexture(clazzName,Texture.fromBitmapData(ImageUtil.getBitmapdata(Assets.getClass(clazzName),1)));
 					s9s.push(clazzName);
 				}
