@@ -4,8 +4,10 @@ package lzm.starling.swf.tool.ui
 	import com.bit101.components.ComboBox;
 	import com.bit101.components.HUISlider;
 	import com.bit101.components.InputText;
+	import com.bit101.components.Label;
 	import com.bit101.components.PushButton;
 	
+	import flash.desktop.NativeApplication;
 	import flash.display.BitmapData;
 	import flash.display.Loader;
 	import flash.display.LoaderInfo;
@@ -83,6 +85,8 @@ package lzm.starling.swf.tool.ui
 			_fpsValue = uiConfig.getCompById("fpsValue") as HUISlider;
 			
 			_exportBtn = uiConfig.getCompById("exportBtn") as PushButton;
+			
+			(uiConfig.getCompById("versionText") as Label).text = "V"+(NativeApplication.nativeApplication.applicationDescriptor.children()[3]);
 		}
 		
 		/**

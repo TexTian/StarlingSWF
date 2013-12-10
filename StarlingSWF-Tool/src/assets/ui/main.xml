@@ -39,6 +39,7 @@
 				</HBox>
 				<HUISlider label="Swf帧率:" id="fpsValue" value="24" maximum="60" minimum="24" event="change:onFpsChange"/>
 				<PushButton id="exportBtn" label="导出" event="click:onExportBtn" enabled="false"/>
+				<Label id="versionText"/>
 			</HBox>
 		</VBox>
 	</Panel>

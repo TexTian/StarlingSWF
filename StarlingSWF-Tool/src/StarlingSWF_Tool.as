@@ -1,5 +1,7 @@
 package
 {
+	import flash.desktop.NativeApplication;
+	import flash.display.NativeWindow;
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
@@ -16,6 +18,10 @@ package
 			stage.color = 0x999999;
 			
 			addChild(new Starup());
+			
+			trace(NativeApplication.nativeApplication.runtimeVersion);
+			trace(NativeApplication.nativeApplication.applicationDescriptor.children()[3]);
+			
 		}
 	}
 }
