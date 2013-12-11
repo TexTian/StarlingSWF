@@ -328,7 +328,7 @@ package lzm.starling.swf.tool.ui
 		
 		private function __export(exportPath:String):void{
 			var swfName:String = Util.getName(_swfPath.text);
-			var imageExportPath:String = exportPath + "/images/";
+			var imageExportPath:String = exportPath + "/images/small/";
 			var bigImageExportPath:String = exportPath + "/images/big/";
 			var dataExportPath:String = exportPath + "/data/" + swfName + ".bytes";
 			
