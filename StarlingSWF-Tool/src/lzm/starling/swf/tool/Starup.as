@@ -49,6 +49,7 @@ package lzm.starling.swf.tool
 			_mainUi.addEventListener("selectMovieClip",onSelectMovieClip);
 			_mainUi.addEventListener("selectButton",onSelectButton);
 			_mainUi.addEventListener("selectScale9",onSelectScale9);
+			_mainUi.addEventListener("selectShapeImage",onSelectShapeImage);
 			addChild(_mainUi);
 			
 			_movieClipProUi = new MovieClipPropertyUi();
@@ -126,6 +127,14 @@ package lzm.starling.swf.tool
 		private function onSelectScale9(e:UIEvent):void{
 			hidePropertyPanel();
 			_starlingStarup.showScale9(e.data.name);
+		}
+		
+		/**
+		 * 选择moviecllip
+		 * */
+		private function onSelectShapeImage(e:UIEvent):void{
+			hidePropertyPanel();
+			_starlingStarup.showShapeImage(e.data.name);
 		}
 		
 		private function showPropertyPanel():void{

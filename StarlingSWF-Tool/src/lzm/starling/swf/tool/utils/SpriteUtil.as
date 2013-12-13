@@ -5,6 +5,7 @@ package lzm.starling.swf.tool.utils
 	import flash.text.TextField;
 	import flash.utils.getQualifiedClassName;
 	
+	import lzm.starling.swf.Swf;
 	import lzm.starling.swf.tool.Starup;
 
 	/**
@@ -50,7 +51,7 @@ package lzm.starling.swf.tool.utils
 					childInfo.push("");
 				}
 				
-				if(type == "s9"){
+				if(type == Swf.dataKey_Scale9 || type == Swf.dataKey_ShapeImg){
 					childInfo.push(Util.formatNumber(child.width));
 					childInfo.push(Util.formatNumber(child.height));
 				}else if(type == "text"){

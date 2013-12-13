@@ -53,6 +53,7 @@ package lzm.starling.swf.tool.ui
 		private var _movieClipComboBox:ComboBox;
 		private var _buttonComboBox:ComboBox;
 		private var _s9ComboBox:ComboBox;
+		private var _shapeComboBox:ComboBox;
 		
 		private var _bgColorChooser:ColorChooser;
 		private var _fpsValue:HUISlider;
@@ -80,6 +81,7 @@ package lzm.starling.swf.tool.ui
 			_movieClipComboBox = uiConfig.getCompById("movieClipComboBox") as ComboBox;
 			_buttonComboBox = uiConfig.getCompById("buttonComboBox") as ComboBox;
 			_s9ComboBox = uiConfig.getCompById("scale9ComboBox") as ComboBox;
+			_shapeComboBox = uiConfig.getCompById("ShapeComboBox") as ComboBox;
 			
 			_bgColorChooser = uiConfig.getCompById("bgColor") as ColorChooser;
 			_fpsValue = uiConfig.getCompById("fpsValue") as HUISlider;
@@ -143,6 +145,7 @@ package lzm.starling.swf.tool.ui
 			Assets.movieClipDatas = {};
 			Assets.buttons = {};
 			Assets.s9s = {};
+			Assets.shapeImg = {};
 			
 			if(Assets.asset){
 				Assets.asset.purge();
@@ -154,6 +157,7 @@ package lzm.starling.swf.tool.ui
 			var movieClips:Array = [];
 			var buttons:Array = [];
 			var s9s:Array = [];
+			var shapeImg:Array = [];
 			
 			var length:int = clazzKeys.length;
 			var clazzName:String;
@@ -176,6 +180,10 @@ package lzm.starling.swf.tool.ui
 					Assets.s9s[clazzName] = Scale9Util.getScale9Info(Assets.getClass(clazzName));
 					Assets.asset.addTexture(clazzName,Texture.fromBitmapData(ImageUtil.getBitmapdata(Assets.getClass(clazzName),1)));
 					s9s.push(clazzName);
+				}else if(Util.getChildType(clazzName) == Swf.dataKey_ShapeImg){
+					Assets.shapeImg[clazzName] = [];
+					Assets.asset.addTexture(clazzName,Texture.fromBitmapData(ImageUtil.getBitmapdata(Assets.getClass(clazzName),1)));
+					shapeImg.push(clazzName);
 				}
 			}
 			
@@ -185,7 +193,8 @@ package lzm.starling.swf.tool.ui
 				"spr":Assets.spriteDatas,
 				"mc":Assets.movieClipDatas,
 				"btn":Assets.buttons,
-				"s9":Assets.s9s
+				"s9":Assets.s9s,
+				"shapeImg":Assets.shapeImg
 			}),"utf-8");
 			swfData.compress();
 			Assets.swf = new Swf(swfData,Assets.asset);
@@ -195,6 +204,7 @@ package lzm.starling.swf.tool.ui
 			movieClips.sort();
 			buttons.sort();
 			s9s.sort();
+			shapeImg.sort();
 			
 			_imageComboBox.selectedIndex = -1;
 			_spriteComboBox.selectedIndex = -1;
@@ -240,6 +250,14 @@ package lzm.starling.swf.tool.ui
 			}else{
 				_s9ComboBox.items = [];
 				_s9ComboBox.enabled = false;
+			}
+			
+			if(shapeImg.length > 0){
+				_shapeComboBox.items =shapeImg;
+				_shapeComboBox.enabled = true;
+			}else{
+				_shapeComboBox.items = [];
+				_shapeComboBox.enabled = false;
 			}
 		}
 		
@@ -306,6 +324,17 @@ package lzm.starling.swf.tool.ui
 			}
 		}
 		
+		/**
+		 * 选择shapeImage
+		 * */
+		public function onSelectShapeImage(e:Event):void{
+			if(_shapeComboBox.selectedItem){
+				var event:UIEvent = new UIEvent("selectShapeImage");
+				event.data = {name:_shapeComboBox.selectedItem};
+				dispatchEvent(event);
+			}
+		}
+		
 		public function onColorChange(e:Event):void{
 			Starling.current.stage.color = stage.color = _bgColorChooser.value;
 		}
@@ -334,6 +363,7 @@ package lzm.starling.swf.tool.ui
 			
 			var images:Array = _imageComboBox.items;
 			images = images.concat(_s9ComboBox.items);
+			images = images.concat(_shapeComboBox.items);
 			var length:int = images.length;
 			
 			var bitmapdata:BitmapData;
@@ -469,7 +499,8 @@ package lzm.starling.swf.tool.ui
 				"spr":Assets.spriteDatas,
 				"mc":Assets.movieClipDatas,
 				"btn":Assets.buttons,
-				"s9":Assets.s9s
+				"s9":Assets.s9s,
+				"shapeImg":Assets.shapeImg
 			}),"utf-8");
 			swfData.compress();
 			var file:File = new File(dataExportPath);

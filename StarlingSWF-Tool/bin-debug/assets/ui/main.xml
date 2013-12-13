@@ -31,6 +31,10 @@
 					<Label text="Scale9Images:"/>
 					<ComboBox id="scale9ComboBox" width="180" enabled="false" event="select:onSelectScale9" />
 				</HBox>
+				<HBox>
+					<Label text="ShapeImages:"/>
+					<ComboBox id="ShapeComboBox" width="180" enabled="false" event="select:onSelectShapeImage" />
+				</HBox>
 			</HBox>
 			<HBox spacing="24">
 				<HBox>

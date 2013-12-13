@@ -13,6 +13,7 @@ package lzm.starling.swf.tool.starling
 	import lzm.starling.STLRootClass;
 	import lzm.starling.STLStarup;
 	import lzm.starling.gestures.DragGestures;
+	import lzm.starling.swf.display.ShapeImage;
 	import lzm.starling.swf.tool.asset.Assets;
 	import lzm.util.Mobile;
 	
@@ -96,6 +97,21 @@ package lzm.starling.swf.tool.starling
 			scale92.x = scale91.width + 12;
 			scale92.width = scale92.width < 200 ? 200 : scale92.width;
 			scale92.height = scale92.height < 200 ? 200 : scale92.height;
+			
+			showObject(spr);
+		}
+		
+		public function showShapeImage(name:String):void{
+			var spr:Sprite = new Sprite();
+			
+			var shapeImage1:ShapeImage = Assets.swf.createShapeImage(name);
+			spr.addChild(shapeImage1);
+			
+			var shapeImage2:ShapeImage = Assets.swf.createShapeImage(name);
+			spr.addChild(shapeImage2);
+			shapeImage2.x = shapeImage1.width + 12;
+			shapeImage2.width = shapeImage2.width < 200 ? 200 : shapeImage2.width;
+			shapeImage2.height = shapeImage2.height < 200 ? 200 : shapeImage2.height;
 			
 			showObject(spr);
 		}

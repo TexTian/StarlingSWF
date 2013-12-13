@@ -24,6 +24,7 @@ package lzm.starling.swf.tool.asset
 		public static var movieClipDatas:Object;
 		public static var buttons:Object;
 		public static var s9s:Object;
+		public static var shapeImg:Object;
 		public static var swf:Swf;
 		public static var asset:AssetManager;
 		

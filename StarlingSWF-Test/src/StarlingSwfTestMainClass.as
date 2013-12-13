@@ -33,9 +33,12 @@ package
 			addChild(textfield);
 			
 			assets = new AssetManager(STLConstant.scale,STLConstant.useMipMaps);
+			assets.verbose = true;
 			var file:File = File.applicationDirectory;
 			
-			assets.enqueue(file.resolvePath(formatString("assets/{0}x/",STLConstant.scale)));
+			assets.enqueue(file.resolvePath(formatString("assets/{0}x/data",STLConstant.scale)));
+			assets.enqueue(file.resolvePath(formatString("assets/{0}x/images/big",STLConstant.scale)));
+			assets.enqueue(file.resolvePath(formatString("assets/{0}x/images/small",STLConstant.scale)));
 			assets.loadQueue(function(ratio:Number):void{
 				textfield.text = "loading...." + int(ratio*100)+"%";
 				if(ratio == 1){
@@ -48,9 +51,6 @@ package
 		
 		private function test1():void{
 			var swf:Swf = new Swf(assets.getByteArray("test"),assets,60);
-			
-			var image:Image = swf.createImage("img_big_test");
-			addChild(image);
 			
 			var sprite:Sprite = swf.createSprite("spr_1");
 			addChild(sprite);
