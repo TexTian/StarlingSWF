@@ -29,6 +29,7 @@ package lzm.starling.swf.tool.ui
 	import lzm.starling.swf.tool.utils.MovieClipUtil;
 	import lzm.starling.swf.tool.utils.Scale9Util;
 	import lzm.starling.swf.tool.utils.SpriteUtil;
+	import lzm.starling.swf.tool.utils.SysUtils;
 	import lzm.starling.swf.tool.utils.TextureUtil;
 	import lzm.starling.swf.tool.utils.Util;
 	
@@ -88,7 +89,7 @@ package lzm.starling.swf.tool.ui
 			
 			_exportBtn = uiConfig.getCompById("exportBtn") as PushButton;
 			
-			(uiConfig.getCompById("versionText") as Label).text = "V"+(NativeApplication.nativeApplication.applicationDescriptor.children()[3]);
+			(uiConfig.getCompById("versionText") as Label).text = "V"+SysUtils.version;
 		}
 		
 		/**

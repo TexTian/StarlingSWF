@@ -12,6 +12,8 @@ package lzm.starling.swf.tool
 	import lzm.starling.swf.tool.ui.MainUi;
 	import lzm.starling.swf.tool.ui.MovieClipPropertyUi;
 	import lzm.starling.swf.tool.ui.UIEvent;
+	import lzm.starling.swf.tool.ui.UpdateUi;
+	import lzm.starling.swf.tool.utils.WebUtils;
 	
 	/**
 	 * 
@@ -57,6 +59,14 @@ package lzm.starling.swf.tool
 			_movieClipProUi.y = 120;
 			
 			initStarling();
+			
+			WebUtils.checkVersion(function(needUpdate:Boolean,updateUrl:String):void{
+				if(needUpdate){
+					var updateUi:UpdateUi = new UpdateUi(updateUrl);
+					addChild(updateUi);
+				}
+			});
+			
 		}
 		
 		private function initStarling():void{

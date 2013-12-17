@@ -1,11 +1,12 @@
 package
 {
-	import flash.desktop.NativeApplication;
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
 	
 	import lzm.starling.swf.tool.Starup;
+	import lzm.starling.swf.tool.utils.WebUtils;
+	import lzm.util.LSOManager;
 	
 	public class StarlingSWF_Tool extends Sprite
 	{
@@ -16,11 +17,11 @@ package
 			stage.frameRate = 60;
 			stage.color = 0x999999;
 			
+			LSOManager.NAME = "StarlingSwf";
+			
+			WebUtils.register();
+			
 			addChild(new Starup());
-			
-			trace(NativeApplication.nativeApplication.runtimeVersion);
-			trace(NativeApplication.nativeApplication.applicationDescriptor.children()[3]);
-			
 		}
 	}
 }
