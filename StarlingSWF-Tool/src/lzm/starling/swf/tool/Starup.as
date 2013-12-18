@@ -60,9 +60,9 @@ package lzm.starling.swf.tool
 			
 			initStarling();
 			
-			WebUtils.checkVersion(function(needUpdate:Boolean,updateUrl:String):void{
+			WebUtils.checkVersion(function(needUpdate:Boolean):void{
 				if(needUpdate){
-					var updateUi:UpdateUi = new UpdateUi(updateUrl);
+					var updateUi:UpdateUi = new UpdateUi();
 					addChild(updateUi);
 				}
 			});

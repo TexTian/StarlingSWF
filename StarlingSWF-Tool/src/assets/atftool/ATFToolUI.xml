@@ -21,6 +21,7 @@
 				<RadioButton id="p2" label="Android" groupName="group1"/>
 				<CheckBox id="compress" selected="true" label="压缩"></CheckBox>
 				<CheckBox id="mips" label="mips"></CheckBox>
+				<CheckBox id="merger" label="合并xml"></CheckBox>
 			</HBox>
 			<CheckBox id="to_square" label="图像自动转换为正方形"></CheckBox>
 			<CheckBox id="converChilds" selected="true" label="转换子目录"></CheckBox>

@@ -3,15 +3,14 @@ package lzm.starling.swf.tool.ui
 	import flash.events.Event;
 	import flash.net.URLRequest;
 	import flash.net.navigateToURL;
+	
+	import lzm.starling.swf.tool.utils.WebUtils;
 
 	public class UpdateUi extends BaseUI
 	{
-		private var _updateUrl:String;
-		public function UpdateUi(updateUrl:String)
+		public function UpdateUi()
 		{
 			super();
-			
-			_updateUrl = updateUrl;
 			
 			loadUi("assets/ui/update.xml");
 		}
@@ -22,7 +21,7 @@ package lzm.starling.swf.tool.ui
 		}
 		
 		public function onYes(e:Event):void{
-			navigateToURL(new URLRequest(_updateUrl),"_blank");
+			navigateToURL(new URLRequest(WebUtils.updateUrl),"_blank");
 		}
 		
 		public function onNo(e:Event):void{

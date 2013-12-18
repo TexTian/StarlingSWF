@@ -11,7 +11,9 @@ package lzm.atf.tool
 	import flash.utils.setTimeout;
 	
 	import lzm.atf.tool.utils.BitmapUtil;
+	import lzm.atf.tool.utils.MergerUtil;
 	import lzm.atf.tool.utils.png2atfUtil;
+	import lzm.starling.STLConstant;
 	
 	[SWF(width=500,height=395)]
 	public class ATFTool extends Sprite
@@ -29,21 +31,44 @@ package lzm.atf.tool
 		
 		private var exportFiles:Vector.<File>;
 		
+		private var _bgSprite:Sprite;
+		private var _window:Window;
+		
 		public function ATFTool()
 		{
-			var window:Window = new Window(this,0,0,"ATF导出工具");
-			window.hasCloseButton = true;
-			window.width = 500;
-			window.height = 416;
-			window.addEventListener(Event.CLOSE,onClose);
+			_bgSprite = new Sprite();
+			_bgSprite.graphics.beginFill(0x000000,0.7);
+			_bgSprite.graphics.drawRect(0,0,100,100);
+			_bgSprite.graphics.endFill();
+			addChild(_bgSprite);
+			
+			_window = new Window(this,0,0,"ATF导出工具");
+			_window.hasCloseButton = true;
+			_window.width = 500;
+			_window.height = 416;
+			_window.addEventListener(Event.CLOSE,onClose);
 			
 			ui = new UIPanel();
 			ui.addEventListener("Export",onExport);
-			window.addChild(ui);
+			_window.addChild(ui);
+			
+			addEventListener(Event.ADDED_TO_STAGE,addToStage);
+		}
+		
+		private function addToStage(e:Event):void{
+			_bgSprite.width = stage.stageWidth;
+			_bgSprite.height = stage.stageHeight;
+			
+			_window.x = (_bgSprite.width - _window.width)/2;
+			_window.y = _bgSprite.height * 0.2;
+			
+			STLConstant.currnetAppRoot.touchable = false;
 		}
 		
 		private function onClose(e:Event):void{
 			parent.removeChild(this);
+			
+			STLConstant.currnetAppRoot.touchable = true;
 		}
 		
 		/**
@@ -148,6 +173,15 @@ package lzm.atf.tool
 						fs.open(reFile,FileMode.WRITE);
 						fs.writeBytes(reImageBytes);
 						fs.close();
+					}
+					
+					//合并xml
+					if(ui.mergerXml){
+						var exportFileXml:String = exportFile.replace(".atf",".xml");
+						var xmlFile:File = new File(exportFileXml);
+						if(xmlFile.exists){
+							MergerUtil.mergerAtf_Xml(new File(exportFile),xmlFile);
+						}
 					}
 					
 					if(exportFiles.length > 0){

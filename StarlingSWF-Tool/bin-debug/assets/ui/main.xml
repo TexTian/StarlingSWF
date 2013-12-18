@@ -7,6 +7,10 @@
 				<InputText id="swfSource" enabled="false" width="200"/>
 				<PushButton id="selectSwfSource" label="选择" event="click:onSelectSwfSource"/>
 				<PushButton id="refreshSwfSource" label="刷新" event="click:onRefreshSwfSource" enabled="false"/>
+				<Label text="		|友情工具|"/>
+				<PushButton id="openAtfTool" label="ATF工具" event="click:onOpenAtfTool"/>
+				<Label text="				"/>
+				<PushButton id="openTutorials" label="工具教程" event="click:onOpenTutorials"/>
 			</HBox>
 			<HBox x="10" y="10" spacing="6">
 				<HBox>

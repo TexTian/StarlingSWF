@@ -140,6 +140,13 @@ package lzm.atf.tool
 		}
 		
 		/**
+		 * @return 是否合并xml
+		 */		
+		public function get mergerXml():Boolean{
+			return (_config.getCompById("merger") as CheckBox).selected;
+		}
+		
+		/**
 		 * @return 输出质量
 		 */		
 		public function get quality():int{

@@ -7,7 +7,6 @@ package lzm.starling.swf.tool.ui
 	import com.bit101.components.Label;
 	import com.bit101.components.PushButton;
 	
-	import flash.desktop.NativeApplication;
 	import flash.display.BitmapData;
 	import flash.display.Loader;
 	import flash.display.LoaderInfo;
@@ -20,9 +19,11 @@ package lzm.starling.swf.tool.ui
 	import flash.geom.Rectangle;
 	import flash.net.FileFilter;
 	import flash.net.URLRequest;
+	import flash.net.navigateToURL;
 	import flash.utils.ByteArray;
 	import flash.utils.setTimeout;
 	
+	import lzm.atf.tool.ATFTool;
 	import lzm.starling.swf.Swf;
 	import lzm.starling.swf.tool.asset.Assets;
 	import lzm.starling.swf.tool.utils.ImageUtil;
@@ -32,6 +33,7 @@ package lzm.starling.swf.tool.ui
 	import lzm.starling.swf.tool.utils.SysUtils;
 	import lzm.starling.swf.tool.utils.TextureUtil;
 	import lzm.starling.swf.tool.utils.Util;
+	import lzm.starling.swf.tool.utils.WebUtils;
 	
 	import starling.core.Starling;
 	import starling.textures.Texture;
@@ -88,6 +90,9 @@ package lzm.starling.swf.tool.ui
 			_fpsValue = uiConfig.getCompById("fpsValue") as HUISlider;
 			
 			_exportBtn = uiConfig.getCompById("exportBtn") as PushButton;
+			
+			var pushButton:PushButton = uiConfig.getCompById("openTutorials") as PushButton;
+			pushButton.labelComponent.textField.textColor = 0xff0000;
 			
 			(uiConfig.getCompById("versionText") as Label).text = "V"+SysUtils.version;
 		}
@@ -342,7 +347,13 @@ package lzm.starling.swf.tool.ui
 		
 		public function onFpsChange(e:Event):void{
 			Assets.swf.fps = _fpsValue.value;
-//			stage.frameRate = _fpsValue.value;
+		}
+		
+		/**
+		 * 点击了教程按钮
+		 * */
+		public function onOpenTutorials(e:Event):void{
+			navigateToURL(new URLRequest(WebUtils.tutorialsUrl),"_blank");
 		}
 		
 		public function onExportBtn(e:Event):void{
@@ -511,6 +522,16 @@ package lzm.starling.swf.tool.ui
 			fs.close();
 		}
 		
+		
+		//--------------以下为友情工具---------------//
+		
+		private var _atfTool:ATFTool;
+		public function onOpenAtfTool(e:Event):void{
+			if(_atfTool == null){
+				_atfTool = new ATFTool();
+			}
+			addChild(_atfTool);
+		}
 		
 	}
 }
