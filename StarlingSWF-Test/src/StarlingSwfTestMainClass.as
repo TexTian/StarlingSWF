@@ -1,6 +1,7 @@
 package
 {
 	import flash.filesystem.File;
+	import flash.geom.Rectangle;
 	
 	import lzm.starling.STLConstant;
 	import lzm.starling.STLMainClass;
@@ -9,7 +10,6 @@ package
 	import lzm.starling.swf.display.SwfMovieClip;
 	
 	import starling.core.Starling;
-	import starling.display.Image;
 	import starling.display.Sprite;
 	import starling.text.TextField;
 	import starling.utils.AssetManager;
@@ -55,7 +55,11 @@ package
 			var sprite:Sprite = swf.createSprite("spr_1");
 			addChild(sprite);
 			
-			new DragGestures(sprite);
+			var gestures:DragGestures = new DragGestures(sprite);
+			gestures.setDragRectangle(new Rectangle(0,0,STLConstant.StageWidth,STLConstant.StageHeight),sprite.width,sprite.height);
+			
+			sprite.scaleX = 0.5;
+			sprite.scaleY = 0.5;
 		}
 		
 		private function test2():void{
