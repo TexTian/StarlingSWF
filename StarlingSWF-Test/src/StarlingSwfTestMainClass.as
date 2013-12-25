@@ -2,6 +2,7 @@ package
 {
 	import flash.filesystem.File;
 	import flash.geom.Rectangle;
+	import flash.utils.setTimeout;
 	
 	import lzm.starling.STLConstant;
 	import lzm.starling.STLMainClass;
@@ -60,6 +61,12 @@ package
 			
 			sprite.scaleX = 0.5;
 			sprite.scaleY = 0.5;
+			
+			setTimeout(function():void{
+				sprite.removeFromParent(true);
+				swf.dispose(false);
+				test1();
+			},1000);
 		}
 		
 		private function test2():void{
