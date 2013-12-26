@@ -369,6 +369,7 @@ package lzm.starling.swf.tool.ui
 		
 		private function __export(exportPath:String):void{
 			var swfName:String = Util.getName(_swfPath.text);
+			var mergerImageExportPath:String = exportPath + "/images/";
 			var imageExportPath:String = exportPath + "/images/small/";
 			var bigImageExportPath:String = exportPath + "/images/big/";
 			var dataExportPath:String = exportPath + "/data/" + swfName + ".bytes";
@@ -442,10 +443,10 @@ package lzm.starling.swf.tool.ui
 					textureAtlasBitmapData.copyPixels(bitmapdata,tempRect,tempPoint);
 				}
 				
-				saveImage(imageExportPath + swfName + ".png",textureAtlasBitmapData);
+				saveImage(mergerImageExportPath + swfName + ".png",textureAtlasBitmapData);
 				
 				xml.@imagePath = swfName + ".png";
-				saveXml(imageExportPath + swfName + ".xml",xml.toXMLString());
+				saveXml(mergerImageExportPath + swfName + ".xml",xml.toXMLString());
 				
 			}else{
 				//小图导出
