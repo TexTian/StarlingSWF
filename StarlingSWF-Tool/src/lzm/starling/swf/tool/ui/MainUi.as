@@ -378,6 +378,10 @@ package lzm.starling.swf.tool.ui
 			images = images.concat(_s9ComboBox.items);
 			images = images.concat(_shapeComboBox.items);
 			var length:int = images.length;
+			if(length == 0){
+				Loading.instance.hide();
+				return;
+			}
 			
 			var bitmapdata:BitmapData;
 			var bitmapdatas:Array = [];
