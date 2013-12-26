@@ -1,6 +1,9 @@
 package lzm.starling.swf.tool.utils
 {
 	import flash.display.MovieClip;
+	import flash.geom.Rectangle;
+	
+	import lzm.starling.swf.tool.Starup;
 
 	public class Scale9Util
 	{
@@ -9,7 +12,14 @@ package lzm.starling.swf.tool.utils
 		 * */
 		public static function getScale9Info(clazz:Class):Array{
 			var mc:MovieClip = new clazz();
-			return [mc.scale9Grid.x,mc.scale9Grid.y,mc.scale9Grid.width,mc.scale9Grid.height];
+			
+			Starup.tempContent.addChild(mc);
+			
+			var rect:Rectangle = mc.getBounds(Starup.tempContent);
+			
+			Starup.tempContent.removeChild(mc);
+			
+			return [mc.scale9Grid.x - rect.x,mc.scale9Grid.y - rect.y,mc.scale9Grid.width,mc.scale9Grid.height];
 		}
 	}
 }
