@@ -161,6 +161,13 @@ package lzm.atf.tool
 		}
 		
 		/**
+		 * @return 是否复制配置文件到导出目录
+		 */		
+		public function get copy_configs():Boolean{
+			return (_config.getCompById("copy_configs") as CheckBox).selected;
+		}
+		
+		/**
 		 * @return 是否转换子目录
 		 */		
 		public function get converChilds():Boolean{

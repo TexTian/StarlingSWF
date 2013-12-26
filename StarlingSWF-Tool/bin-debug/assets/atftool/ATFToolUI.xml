@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <comps>
-	<Panel width="500" height="395">
+	<Panel width="500" height="413">
 		<VBox x="10" y="10" spacing="6">
 			<Label text="源目录和导出目录不能为包含关系"/>
 			<HBox>
@@ -24,6 +24,7 @@
 				<CheckBox id="merger" label="合并xml"></CheckBox>
 			</HBox>
 			<CheckBox id="to_square" label="图像自动转换为正方形"></CheckBox>
+			<CheckBox id="copy_configs" selected="true" label="复制配置文件到导出目录"></CheckBox>
 			<CheckBox id="converChilds" selected="true" label="转换子目录"></CheckBox>
 			<HBox>
 				<Label text="输出质量:"/>

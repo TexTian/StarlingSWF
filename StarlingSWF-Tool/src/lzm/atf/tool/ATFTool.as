@@ -45,7 +45,7 @@ package lzm.atf.tool
 			_window = new Window(this,0,0,"ATF导出工具");
 			_window.hasCloseButton = true;
 			_window.width = 500;
-			_window.height = 416;
+			_window.height = 434;
 			_window.addEventListener(Event.CLOSE,onClose);
 			
 			ui = new UIPanel();
@@ -116,7 +116,15 @@ package lzm.atf.tool
 					ergodicDirectory(f);
 				}else{
 					if(f.extension != "png" && f.extension != "jpg"){
-						copyFile(f);
+						if(f.extension == "xml" && ui.mergerXml){
+							var pngFile:File = new File(f.nativePath.replace(".xml",".png"));
+							var jpgFile:File = new File(f.nativePath.replace(".xml",".jpg"));
+							if(pngFile.exists || jpgFile.exists){
+								copyFile(f);
+							}
+						}else if(ui.copy_configs){
+							copyFile(f);
+						}
 					}else{
 						exportFiles.push(f);
 					}
