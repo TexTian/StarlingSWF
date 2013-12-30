@@ -115,7 +115,7 @@ package lzm.starling.swf.tool.ui
 			_swfPath.text = file.url;
 			
 			Assets.openTempFile(Util.getName(_swfPath.text),function():void{
-				loadSwf();
+				onRefreshSwfSource(null);
 			});
 			
 		}
@@ -139,7 +139,6 @@ package lzm.starling.swf.tool.ui
 			var loaderinfo:LoaderInfo = e.target as LoaderInfo;
 			loaderinfo.removeEventListener(Event.COMPLETE,loadSwfComplete);
 			
-			_selectSwfSource.enabled = false;
 			_refreshSwfSource.enabled = true;
 			_exportBtn.enabled = true;
 			
