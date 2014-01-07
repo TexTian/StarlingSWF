@@ -5,6 +5,7 @@ package lzm.starling.swf.tool
 	import flash.events.Event;
 	
 	import lzm.starling.swf.Swf;
+	import lzm.starling.swf.components.ISwfComponent;
 	import lzm.starling.swf.display.SwfMovieClip;
 	import lzm.starling.swf.tool.asset.Assets;
 	import lzm.starling.swf.tool.starling.StarlingStarup;
@@ -14,6 +15,8 @@ package lzm.starling.swf.tool
 	import lzm.starling.swf.tool.ui.UIEvent;
 	import lzm.starling.swf.tool.ui.UpdateUi;
 	import lzm.starling.swf.tool.utils.WebUtils;
+	
+	import starling.display.DisplayObject;
 	
 	/**
 	 * 
@@ -52,6 +55,7 @@ package lzm.starling.swf.tool
 			_mainUi.addEventListener("selectButton",onSelectButton);
 			_mainUi.addEventListener("selectScale9",onSelectScale9);
 			_mainUi.addEventListener("selectShapeImage",onSelectShapeImage);
+			_mainUi.addEventListener("selectComponents",onSelectComponents);
 			addChild(_mainUi);
 			
 			_movieClipProUi = new MovieClipPropertyUi();
@@ -123,7 +127,7 @@ package lzm.starling.swf.tool
 		}
 		
 		/**
-		 * 选择moviecllip
+		 * 选择button
 		 * */
 		private function onSelectButton(e:UIEvent):void{
 			hidePropertyPanel();
@@ -132,7 +136,7 @@ package lzm.starling.swf.tool
 		}
 		
 		/**
-		 * 选择moviecllip
+		 * 选择s9
 		 * */
 		private function onSelectScale9(e:UIEvent):void{
 			hidePropertyPanel();
@@ -140,11 +144,20 @@ package lzm.starling.swf.tool
 		}
 		
 		/**
-		 * 选择moviecllip
+		 * 选择shapeImg
 		 * */
 		private function onSelectShapeImage(e:UIEvent):void{
 			hidePropertyPanel();
 			_starlingStarup.showShapeImage(e.data.name);
+		}
+		
+		/**
+		 * 选择组件
+		 * */
+		private function onSelectComponents(e:UIEvent):void{
+			hidePropertyPanel();
+			var component:ISwfComponent = Assets.swf.createComponent(e.data.name);
+			_starlingStarup.showObject(component as DisplayObject);
 		}
 		
 		private function showPropertyPanel():void{

@@ -57,6 +57,7 @@ package lzm.starling.swf.tool.ui
 		private var _buttonComboBox:ComboBox;
 		private var _s9ComboBox:ComboBox;
 		private var _shapeComboBox:ComboBox;
+		private var _componentsComboBox:ComboBox;
 		
 		private var _bgColorChooser:ColorChooser;
 		private var _fpsValue:HUISlider;
@@ -64,6 +65,8 @@ package lzm.starling.swf.tool.ui
 		private var _exportBtn:PushButton;
 		
 		private var _exportOption:ExportUi;
+		
+		private var _swfData:ByteArray;
 		
 		public function MainUi()
 		{
@@ -85,6 +88,7 @@ package lzm.starling.swf.tool.ui
 			_buttonComboBox = uiConfig.getCompById("buttonComboBox") as ComboBox;
 			_s9ComboBox = uiConfig.getCompById("scale9ComboBox") as ComboBox;
 			_shapeComboBox = uiConfig.getCompById("ShapeComboBox") as ComboBox;
+			_componentsComboBox = uiConfig.getCompById("ComponentsComboBox") as ComboBox;
 			
 			_bgColorChooser = uiConfig.getCompById("bgColor") as ColorChooser;
 			_fpsValue = uiConfig.getCompById("fpsValue") as HUISlider;
@@ -151,6 +155,7 @@ package lzm.starling.swf.tool.ui
 			Assets.buttons = {};
 			Assets.s9s = {};
 			Assets.shapeImg = {};
+			Assets.components = {};
 			
 			if(Assets.asset){
 				Assets.asset.purge();
@@ -163,46 +168,53 @@ package lzm.starling.swf.tool.ui
 			var buttons:Array = [];
 			var s9s:Array = [];
 			var shapeImg:Array = [];
+			var components:Array = [];
 			
 			var length:int = clazzKeys.length;
 			var clazzName:String;
+			var childType:String;
 			for (var i:int = 0; i < length; i++) {
 				clazzName = clazzKeys[i];
-				if(Util.getChildType(clazzName) == Swf.dataKey_Image){
+				childType = Util.getChildType(clazzName);
+				if(childType == Swf.dataKey_Image){
 					Assets.imageDatas[clazzName] = ImageUtil.getImageInfo(Assets.getClass(clazzName));
 					Assets.asset.addTexture(clazzName,Texture.fromBitmapData(ImageUtil.getBitmapdata(Assets.getClass(clazzName),1)));
 					images.push(clazzName);
-				}else if(Util.getChildType(clazzName) == Swf.dataKey_Sprite){
+				}else if(childType == Swf.dataKey_Sprite){
 					Assets.spriteDatas[clazzName] = SpriteUtil.getSpriteInfo(Assets.getClass(clazzName));
 					sprites.push(clazzName);
-				}else if(Util.getChildType(clazzName) == Swf.dataKey_MovieClip){
+				}else if(childType == Swf.dataKey_MovieClip){
 					Assets.movieClipDatas[clazzName] = MovieClipUtil.getMovieClipInfo(clazzName,Assets.getClass(clazzName));
 					movieClips.push(clazzName);
-				}else if(Util.getChildType(clazzName) == Swf.dataKey_Button){
+				}else if(childType == Swf.dataKey_Button){
 					Assets.buttons[clazzName] = SpriteUtil.getSpriteInfo(Assets.getClass(clazzName));
 					buttons.push(clazzName);
-				}else if(Util.getChildType(clazzName) == Swf.dataKey_Scale9){
+				}else if(childType == Swf.dataKey_Scale9){
 					Assets.s9s[clazzName] = Scale9Util.getScale9Info(Assets.getClass(clazzName));
 					Assets.asset.addTexture(clazzName,Texture.fromBitmapData(ImageUtil.getBitmapdata(Assets.getClass(clazzName),1)));
 					s9s.push(clazzName);
-				}else if(Util.getChildType(clazzName) == Swf.dataKey_ShapeImg){
+				}else if(childType == Swf.dataKey_ShapeImg){
 					Assets.shapeImg[clazzName] = [];
 					Assets.asset.addTexture(clazzName,Texture.fromBitmapData(ImageUtil.getBitmapdata(Assets.getClass(clazzName),1)));
 					shapeImg.push(clazzName);
+				}else if(childType == Swf.dataKey_Componet){
+					Assets.components[clazzName] = SpriteUtil.getSpriteInfo(Assets.getClass(clazzName));
+					components.push(clazzName);
 				}
 			}
 			
-			var swfData:ByteArray = new ByteArray();
-			swfData.writeMultiByte(JSON.stringify({
+			_swfData = new ByteArray();
+			_swfData.writeMultiByte(JSON.stringify({
 				"img":Assets.imageDatas,
 				"spr":Assets.spriteDatas,
 				"mc":Assets.movieClipDatas,
 				"btn":Assets.buttons,
 				"s9":Assets.s9s,
-				"shapeImg":Assets.shapeImg
+				"shapeImg":Assets.shapeImg,
+				"comp":Assets.components
 			}),"utf-8");
-			swfData.compress();
-			Assets.swf = new Swf(swfData,Assets.asset);
+			_swfData.compress();
+			Assets.swf = new Swf(_swfData,Assets.asset);
 			
 			images.sort();
 			sprites.sort();
@@ -210,12 +222,14 @@ package lzm.starling.swf.tool.ui
 			buttons.sort();
 			s9s.sort();
 			shapeImg.sort();
+			components.sort();
 			
 			_imageComboBox.selectedIndex = -1;
 			_spriteComboBox.selectedIndex = -1;
 			_movieClipComboBox.selectedIndex = -1;
 			_buttonComboBox.selectedIndex = -1;
 			_s9ComboBox.selectedIndex = -1;
+			_componentsComboBox.selectedIndex = -1;
 			
 			if(images.length > 0){
 				_imageComboBox.items = images;
@@ -263,6 +277,14 @@ package lzm.starling.swf.tool.ui
 			}else{
 				_shapeComboBox.items = [];
 				_shapeComboBox.enabled = false;
+			}
+			
+			if(components.length > 0){
+				_componentsComboBox.items =components;
+				_componentsComboBox.enabled = true;
+			}else{
+				_componentsComboBox.items = [];
+				_componentsComboBox.enabled = false;
 			}
 		}
 		
@@ -336,6 +358,17 @@ package lzm.starling.swf.tool.ui
 			if(_shapeComboBox.selectedItem){
 				var event:UIEvent = new UIEvent("selectShapeImage");
 				event.data = {name:_shapeComboBox.selectedItem};
+				dispatchEvent(event);
+			}
+		}
+		
+		/**
+		 * 选择一个组件
+		 * */
+		public function onSelectComponents(e:Event):void{
+			if(_componentsComboBox.selectedItem){
+				var event:UIEvent = new UIEvent("selectComponents");
+				event.data = {name:_componentsComboBox.selectedItem};
 				dispatchEvent(event);
 			}
 		}
@@ -509,20 +542,10 @@ package lzm.starling.swf.tool.ui
 		}
 		//保存swf数据
 		private function saveSwfData(dataExportPath:String):void{
-			var swfData:ByteArray = new ByteArray();
-			swfData.writeMultiByte(JSON.stringify({
-				"img":Assets.imageDatas,
-				"spr":Assets.spriteDatas,
-				"mc":Assets.movieClipDatas,
-				"btn":Assets.buttons,
-				"s9":Assets.s9s,
-				"shapeImg":Assets.shapeImg
-			}),"utf-8");
-			swfData.compress();
 			var file:File = new File(dataExportPath);
 			var fs:FileStream = new FileStream();
 			fs.open(file,FileMode.WRITE);
-			fs.writeBytes(swfData);
+			fs.writeBytes(_swfData);
 			fs.close();
 		}
 		

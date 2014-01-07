@@ -45,7 +45,7 @@ package
 				if(ratio == 1){
 					textfield.removeFromParent(true);
 					
-					test1();
+					test2();
 				}
 			});
 		}
@@ -71,7 +71,7 @@ package
 		
 		private function test2():void{
 			var swf:Swf = new Swf(assets.getByteArray("test"),assets,60);
-			for (var i:int = 0; i < 50; i++) {
+			for (var i:int = 0; i < 20; i++) {
 				var mc:SwfMovieClip = swf.createMovieClip("mc_Zombie_imp");
 				mc.x = Math.random() * STLConstant.StageWidth - 46;
 				mc.y = Math.random() * STLConstant.StageHeight - 63;
