@@ -106,11 +106,7 @@ package lzm.starling.swf.tool.ui
 					combobox.items = ["true","false"];
 					combobox.selectedIndex = property ? 0 : 1;
 					component = combobox;
-				}else if(property is int){
-					component = new InputText();
-					(component as InputText).restrict = "0-9";
-					(component as InputText).text = property;
-				}else if(property is String){
+				}else{
 					component = new InputText();
 					(component as InputText).text = property;
 				}
