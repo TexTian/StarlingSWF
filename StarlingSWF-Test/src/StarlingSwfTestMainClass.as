@@ -37,15 +37,13 @@ package
 			assets.verbose = true;
 			var file:File = File.applicationDirectory;
 			
-			assets.enqueue(file.resolvePath(formatString("assets/{0}x/data",STLConstant.scale)));
-			assets.enqueue(file.resolvePath(formatString("assets/{0}x/images/big",STLConstant.scale)));
-			assets.enqueue(file.resolvePath(formatString("assets/{0}x/images/small",STLConstant.scale)));
+			assets.enqueue(file.resolvePath(formatString("assets/{0}x",STLConstant.scale)));
 			assets.loadQueue(function(ratio:Number):void{
 				textfield.text = "loading...." + int(ratio*100)+"%";
 				if(ratio == 1){
 					textfield.removeFromParent(true);
 					
-					test2();
+					test1();
 				}
 			});
 		}
@@ -58,15 +56,6 @@ package
 			
 			var gestures:DragGestures = new DragGestures(sprite);
 			gestures.setDragRectangle(new Rectangle(0,0,STLConstant.StageWidth,STLConstant.StageHeight),sprite.width,sprite.height);
-			
-			sprite.scaleX = 0.5;
-			sprite.scaleY = 0.5;
-			
-			setTimeout(function():void{
-				sprite.removeFromParent(true);
-				swf.dispose(false);
-				test1();
-			},1000);
 		}
 		
 		private function test2():void{
