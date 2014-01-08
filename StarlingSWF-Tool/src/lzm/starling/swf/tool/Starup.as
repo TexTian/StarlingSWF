@@ -67,7 +67,7 @@ package lzm.starling.swf.tool
 			_movieClipProUi.y = 120;
 			
 			_componentPropertyUI = new ComponentPropertyUI();
-			_componentPropertyUI.x = 1024 - 180;
+			_componentPropertyUI.x = 1024 - 230;
 			_componentPropertyUI.y = 120;
 			
 			initStarling();
