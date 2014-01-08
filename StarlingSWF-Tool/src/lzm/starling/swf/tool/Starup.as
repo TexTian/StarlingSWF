@@ -4,11 +4,14 @@ package lzm.starling.swf.tool
 	import flash.display.Stage;
 	import flash.events.Event;
 	
+	import lzm.starling.gestures.TapGestures;
 	import lzm.starling.swf.Swf;
 	import lzm.starling.swf.components.ISwfComponent;
 	import lzm.starling.swf.display.SwfMovieClip;
+	import lzm.starling.swf.display.SwfSprite;
 	import lzm.starling.swf.tool.asset.Assets;
 	import lzm.starling.swf.tool.starling.StarlingStarup;
+	import lzm.starling.swf.tool.ui.ComponentPropertyUI;
 	import lzm.starling.swf.tool.ui.Loading;
 	import lzm.starling.swf.tool.ui.MainUi;
 	import lzm.starling.swf.tool.ui.MovieClipPropertyUi;
@@ -31,6 +34,7 @@ package lzm.starling.swf.tool
 		
 		private var _mainUi:MainUi;
 		private var _movieClipProUi:MovieClipPropertyUi;
+		private var _componentPropertyUI:ComponentPropertyUI;
 		
 		private var _starlingStarup:StarlingStarup;
 		
@@ -62,6 +66,10 @@ package lzm.starling.swf.tool
 			_movieClipProUi.x = 1024 - 160;
 			_movieClipProUi.y = 120;
 			
+			_componentPropertyUI = new ComponentPropertyUI();
+			_componentPropertyUI.x = 1024 - 180;
+			_componentPropertyUI.y = 120;
+			
 			initStarling();
 			
 			WebUtils.checkVersion(function(needUpdate:Boolean):void{
@@ -85,8 +93,6 @@ package lzm.starling.swf.tool
 			Starup.stage.addChild(Starup.tempContent);
 			
 			Loading.init(stage);
-			
-			Swf.init(stage);
 		}
 		
 		private function onRefresh(e:UIEvent):void{
@@ -110,7 +116,10 @@ package lzm.starling.swf.tool
 		private function onSelectSprite(e:UIEvent):void{
 			hidePropertyPanel();
 			
-			_starlingStarup.showObject(Assets.swf.createSprite(e.data.name));
+			var sprite:SwfSprite = Assets.swf.createSprite(e.data.name);
+			addSelectSpriteComonentEvents(sprite);
+			
+			_starlingStarup.showObject(sprite);
 		}
 		
 		/**
@@ -118,7 +127,8 @@ package lzm.starling.swf.tool
 		 * */
 		private function onSelectMovieClip(e:UIEvent):void{
 			hidePropertyPanel();
-			showPropertyPanel();
+			
+			addChild(_movieClipProUi);
 			
 			var mc:SwfMovieClip = Assets.swf.createMovieClip(e.data.name);
 			mc.name = e.data.name;
@@ -156,17 +166,45 @@ package lzm.starling.swf.tool
 		 * */
 		private function onSelectComponents(e:UIEvent):void{
 			hidePropertyPanel();
-			var component:ISwfComponent = Assets.swf.createComponent(e.data.name);
+			var component:* = Assets.swf.createComponent(e.data.name);
 			_starlingStarup.showObject(component as DisplayObject);
 		}
 		
-		private function showPropertyPanel():void{
-			addChild(_movieClipProUi);
+		/**
+		 * 为sprite中的组件添加选中的方法
+		 * */
+		private function addSelectSpriteComonentEvents(sprite:SwfSprite):void{
+			var numChildren:int = sprite.numChildren;
+			for (var i:int = 0; i < numChildren; i++) {
+				if((sprite.getChildAt(i) as ISwfComponent)){
+					addEvent(sprite.getChildAt(i) as ISwfComponent);
+				}else if((sprite.getChildAt(i) as SwfSprite)){
+					addSelectSpriteComonentEvents(sprite.getChildAt(i) as SwfSprite);
+				}
+			}
+			
+			function addEvent(component:ISwfComponent):void{
+				new TapGestures((component as DisplayObject),function():void{
+					onSelectSpriteComonent(component);
+				});
+			}
+		}
+		
+		/**
+		 * 选中了sprite中的组件
+		 * */
+		private function onSelectSpriteComonent(component:ISwfComponent):void{
+			hidePropertyPanel();
+			_componentPropertyUI.component = component;
+			addChild(_componentPropertyUI);
 		}
 		
 		private function hidePropertyPanel():void{
 			if(_movieClipProUi.parent) _movieClipProUi.parent.removeChild(_movieClipProUi);
+			if(_componentPropertyUI.parent) _componentPropertyUI.parent.removeChild(_componentPropertyUI);
 		}
+		
+		
 		
 	}
 }

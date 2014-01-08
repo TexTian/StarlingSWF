@@ -40,7 +40,7 @@ package lzm.starling.swf.tool.utils
 					child = mc.getChildAt(i) as DisplayObject;
 					childName = getQualifiedClassName(child);
 					type = Util.getChildType(childName);
-					if(type == null){
+					if(type == null || type == Swf.dataKey_Componet){
 						continue;
 					}
 					childInfo = [

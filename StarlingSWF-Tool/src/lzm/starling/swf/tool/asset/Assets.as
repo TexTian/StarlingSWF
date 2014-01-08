@@ -38,17 +38,13 @@ package lzm.starling.swf.tool.asset
 		
 		
 		
-		private static var tempFileName:String;
 		private static var tempFileUrl:String;
 		private static var tempMovieClipData:Object;
 		/**
 		 * 打开记录临时数据的文件
 		 * */
-		public static function openTempFile(name:String,callBack:Function):void{
-			
-			tempFileName = name;
-			
-			var file:File = File.applicationStorageDirectory.resolvePath("tmp/"+name);
+		public static function openTempFile(fileName:String,callBack:Function):void{
+			var file:File = new File(fileName.replace(".swf",".data"));
 			tempFileUrl = file.url;
 			if(file.exists){
 				HttpClient.send(tempFileUrl,{},function(data:String):void{

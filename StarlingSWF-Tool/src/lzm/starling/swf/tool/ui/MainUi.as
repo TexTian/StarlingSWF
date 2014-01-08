@@ -66,8 +66,6 @@ package lzm.starling.swf.tool.ui
 		
 		private var _exportOption:ExportUi;
 		
-		private var _swfData:ByteArray;
-		
 		public function MainUi()
 		{
 			super();
@@ -118,7 +116,7 @@ package lzm.starling.swf.tool.ui
 			
 			_swfPath.text = file.url;
 			
-			Assets.openTempFile(Util.getName(_swfPath.text),function():void{
+			Assets.openTempFile(_swfPath.text,function():void{
 				onRefreshSwfSource(null);
 			});
 			
@@ -181,13 +179,13 @@ package lzm.starling.swf.tool.ui
 					Assets.asset.addTexture(clazzName,Texture.fromBitmapData(ImageUtil.getBitmapdata(Assets.getClass(clazzName),1)));
 					images.push(clazzName);
 				}else if(childType == Swf.dataKey_Sprite){
-					Assets.spriteDatas[clazzName] = SpriteUtil.getSpriteInfo(Assets.getClass(clazzName));
+					Assets.spriteDatas[clazzName] = SpriteUtil.getSpriteInfo(clazzName,Assets.getClass(clazzName));
 					sprites.push(clazzName);
 				}else if(childType == Swf.dataKey_MovieClip){
 					Assets.movieClipDatas[clazzName] = MovieClipUtil.getMovieClipInfo(clazzName,Assets.getClass(clazzName));
 					movieClips.push(clazzName);
 				}else if(childType == Swf.dataKey_Button){
-					Assets.buttons[clazzName] = SpriteUtil.getSpriteInfo(Assets.getClass(clazzName));
+					Assets.buttons[clazzName] = SpriteUtil.getSpriteInfo(clazzName,Assets.getClass(clazzName));
 					buttons.push(clazzName);
 				}else if(childType == Swf.dataKey_Scale9){
 					Assets.s9s[clazzName] = Scale9Util.getScale9Info(Assets.getClass(clazzName));
@@ -198,23 +196,13 @@ package lzm.starling.swf.tool.ui
 					Assets.asset.addTexture(clazzName,Texture.fromBitmapData(ImageUtil.getBitmapdata(Assets.getClass(clazzName),1)));
 					shapeImg.push(clazzName);
 				}else if(childType == Swf.dataKey_Componet){
-					Assets.components[clazzName] = SpriteUtil.getSpriteInfo(Assets.getClass(clazzName));
+					Assets.components[clazzName] = SpriteUtil.getSpriteInfo(clazzName,Assets.getClass(clazzName));
 					components.push(clazzName);
 				}
 			}
 			
-			_swfData = new ByteArray();
-			_swfData.writeMultiByte(JSON.stringify({
-				"img":Assets.imageDatas,
-				"spr":Assets.spriteDatas,
-				"mc":Assets.movieClipDatas,
-				"btn":Assets.buttons,
-				"s9":Assets.s9s,
-				"shapeImg":Assets.shapeImg,
-				"comp":Assets.components
-			}),"utf-8");
-			_swfData.compress();
-			Assets.swf = new Swf(_swfData,Assets.asset);
+			
+			Assets.swf = new Swf(getSwfData(),Assets.asset);
 			
 			images.sort();
 			sprites.sort();
@@ -448,42 +436,43 @@ package lzm.starling.swf.tool.ui
 			
 			if(_exportOption.isMerger){
 				var textureAtlasRect:Rectangle = TextureUtil.packTextures(0,_exportOption.padding,rectMap);
-				var textureAtlasBitmapData:BitmapData = new BitmapData(textureAtlasRect.width,textureAtlasRect.height,true,0);
-				var xml:XML = <TextureAtlas />;
-				var childXml:XML;
-				var imageName:String;
-				var imageRect:Rectangle;
-				
-				var tempRect:Rectangle = new Rectangle();
-				var tempPoint:Point = new Point();
-				
-				length = imageNames.length;
-				for (i = 0; i < length; i++) {
-					imageName = imageNames[i];
-					imageRect = rectMap[imageName];
-					bitmapdata = bitmapdatas[i];
+				if(textureAtlasRect){
+					var textureAtlasBitmapData:BitmapData = new BitmapData(textureAtlasRect.width,textureAtlasRect.height,true,0);
+					var xml:XML = <TextureAtlas />;
+					var childXml:XML;
+					var imageName:String;
+					var imageRect:Rectangle;
 					
-					tempRect.width = bitmapdata.width;
-					tempRect.height = bitmapdata.height;
-					tempPoint.x = imageRect.x;
-					tempPoint.y = imageRect.y;
+					var tempRect:Rectangle = new Rectangle();
+					var tempPoint:Point = new Point();
 					
-					childXml = <SubTexture />;
-					childXml.@name = imageName;
-					childXml.@x = tempPoint.x;
-					childXml.@y = tempPoint.y;
-					childXml.@width = tempRect.width;
-					childXml.@height = tempRect.height;
-					xml.appendChild(childXml);
+					length = imageNames.length;
+					for (i = 0; i < length; i++) {
+						imageName = imageNames[i];
+						imageRect = rectMap[imageName];
+						bitmapdata = bitmapdatas[i];
+						
+						tempRect.width = bitmapdata.width;
+						tempRect.height = bitmapdata.height;
+						tempPoint.x = imageRect.x;
+						tempPoint.y = imageRect.y;
+						
+						childXml = <SubTexture />;
+						childXml.@name = imageName;
+						childXml.@x = tempPoint.x;
+						childXml.@y = tempPoint.y;
+						childXml.@width = tempRect.width;
+						childXml.@height = tempRect.height;
+						xml.appendChild(childXml);
+						
+						textureAtlasBitmapData.copyPixels(bitmapdata,tempRect,tempPoint);
+					}
 					
-					textureAtlasBitmapData.copyPixels(bitmapdata,tempRect,tempPoint);
+					saveImage(mergerImageExportPath + swfName + ".png",textureAtlasBitmapData);
+					
+					xml.@imagePath = swfName + ".png";
+					saveXml(mergerImageExportPath + swfName + ".xml",xml.toXMLString());
 				}
-				
-				saveImage(mergerImageExportPath + swfName + ".png",textureAtlasBitmapData);
-				
-				xml.@imagePath = swfName + ".png";
-				saveXml(mergerImageExportPath + swfName + ".xml",xml.toXMLString());
-				
 			}else{
 				//小图导出
 				length = imageNames.length;
@@ -545,8 +534,26 @@ package lzm.starling.swf.tool.ui
 			var file:File = new File(dataExportPath);
 			var fs:FileStream = new FileStream();
 			fs.open(file,FileMode.WRITE);
-			fs.writeBytes(_swfData);
+			fs.writeBytes(getSwfData());
 			fs.close();
+		}
+		
+		private function getSwfData():ByteArray{
+			var jsonStr:String = JSON.stringify({
+				"img":Assets.imageDatas,
+				"spr":Assets.spriteDatas,
+				"mc":Assets.movieClipDatas,
+				"btn":Assets.buttons,
+				"s9":Assets.s9s,
+				"shapeImg":Assets.shapeImg,
+				"comp":Assets.components
+			});
+			trace(jsonStr);
+			var swfData:ByteArray = new ByteArray();
+			swfData.writeMultiByte(jsonStr,"utf-8");
+			swfData.compress();
+			
+			return swfData;
 		}
 		
 		

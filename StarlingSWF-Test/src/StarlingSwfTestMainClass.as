@@ -2,7 +2,6 @@ package
 {
 	import flash.filesystem.File;
 	import flash.geom.Rectangle;
-	import flash.utils.setTimeout;
 	
 	import lzm.starling.STLConstant;
 	import lzm.starling.STLMainClass;
@@ -10,7 +9,6 @@ package
 	import lzm.starling.swf.Swf;
 	import lzm.starling.swf.display.SwfMovieClip;
 	
-	import starling.core.Starling;
 	import starling.display.Sprite;
 	import starling.text.TextField;
 	import starling.utils.AssetManager;
@@ -26,7 +24,7 @@ package
 		{
 			super();
 			
-			Swf.init(Starling.current.nativeStage);
+			Swf.init(this);
 			
 			textfield = new TextField(200,100,"loading....");
 			textfield.x = (STLConstant.StageWidth - textfield.width)/2;

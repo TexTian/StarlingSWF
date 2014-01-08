@@ -7,6 +7,7 @@ package lzm.starling.swf.tool.utils
 	
 	import lzm.starling.swf.Swf;
 	import lzm.starling.swf.tool.Starup;
+	import lzm.starling.swf.tool.asset.Assets;
 
 	/**
 	 * 
@@ -15,7 +16,7 @@ package lzm.starling.swf.tool.utils
 	 */
 	public class SpriteUtil
 	{
-		public static function getSpriteInfo(clazz:Class):Array{
+		public static function getSpriteInfo(clazzName:String,clazz:Class):Array{
 			var mc:MovieClip = new clazz();
 			
 			Starup.tempContent.addChild(mc);
@@ -65,6 +66,8 @@ package lzm.starling.swf.tool.utils
 					childInfo.push((child as TextField).defaultTextFormat.italic);
 					childInfo.push((child as TextField).defaultTextFormat.bold);
 					childInfo.push((child as TextField).text);
+				}else if(type == Swf.dataKey_Componet){
+					childInfo.push(Assets.getTempData(clazzName + "-" + i + childName));
 				}
 				
 				childInfos.push(childInfo);

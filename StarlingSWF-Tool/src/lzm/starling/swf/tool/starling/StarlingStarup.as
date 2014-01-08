@@ -13,6 +13,7 @@ package lzm.starling.swf.tool.starling
 	import lzm.starling.STLRootClass;
 	import lzm.starling.STLStarup;
 	import lzm.starling.gestures.DragGestures;
+	import lzm.starling.swf.Swf;
 	import lzm.starling.swf.display.ShapeImage;
 	import lzm.starling.swf.tool.asset.Assets;
 	import lzm.util.Mobile;
@@ -79,6 +80,8 @@ package lzm.starling.swf.tool.starling
 					
 					contentSprite = new Sprite();
 					app.addChild(contentSprite);
+					
+					Swf.init(contentSprite);
 					
 					setTimeout(function():void{
 						new DragGestures(app,onDrag);
