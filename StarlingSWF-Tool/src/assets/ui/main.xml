@@ -49,6 +49,10 @@
 					<Label text="背景颜色:"/>
 					<ColorChooser id="bgColor" usePopup="true" value="0x999999" event="change:onColorChange" />
 				</HBox>
+				<HBox>
+				<Label text="是否可拖动:"/>
+					<CheckBox id="isDrag" selected="true" event="click:onIsDrag"/>
+				</HBox>
 				<HUISlider label="Swf帧率:" id="fpsValue" value="24" maximum="60" minimum="24" event="change:onFpsChange"/>
 				<PushButton id="exportBtn" label="导出" event="click:onExportBtn" enabled="false"/>
 				<Label id="versionText"/>

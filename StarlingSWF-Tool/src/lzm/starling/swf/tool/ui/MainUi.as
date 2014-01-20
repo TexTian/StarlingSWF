@@ -1,5 +1,6 @@
 package lzm.starling.swf.tool.ui
 {
+	import com.bit101.components.CheckBox;
 	import com.bit101.components.ColorChooser;
 	import com.bit101.components.ComboBox;
 	import com.bit101.components.HUISlider;
@@ -363,6 +364,12 @@ package lzm.starling.swf.tool.ui
 		
 		public function onColorChange(e:Event):void{
 			Starling.current.stage.color = stage.color = _bgColorChooser.value;
+		}
+		
+		public function onIsDrag(e:Event):void{
+			var event:UIEvent = new UIEvent("onIsDrag");
+			event.data = {value:(uiConfig.getCompById("isDrag") as CheckBox).selected};
+			dispatchEvent(event);
 		}
 		
 		public function onFpsChange(e:Event):void{

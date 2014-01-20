@@ -33,7 +33,7 @@ package lzm.starling.swf.tool.ui
 		protected override function loadXMLComplete(e:Event):void{
 			_propertiesSprite = new Sprite();
 			_propertiesSprite.x = 6;
-			_propertiesSprite.y = 78;
+			_propertiesSprite.y = 106;
 			addChild(_propertiesSprite);
 		}
 		
@@ -140,7 +140,10 @@ package lzm.starling.swf.tool.ui
 			Assets.putTempData(sprite.spriteName + "-" + index + childInfo[0],editorProperties);
 			
 			_component.editableProperties = editorProperties;
-			
+		}
+		
+		public function onTest(e:Event):void{
+			_component.editableProperties = editorProperties;
 		}
 		
 	}

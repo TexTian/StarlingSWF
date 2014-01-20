@@ -52,6 +52,7 @@ package lzm.starling.swf.tool
 			
 			_mainUi = new MainUi();
 			_mainUi.addEventListener("onRefresh",onRefresh);
+			_mainUi.addEventListener("onIsDrag",onIsDrag);
 			
 			_mainUi.addEventListener("selectImage",onSelectImage);
 			_mainUi.addEventListener("selectSprite",onSelectSprite);
@@ -60,6 +61,9 @@ package lzm.starling.swf.tool
 			_mainUi.addEventListener("selectScale9",onSelectScale9);
 			_mainUi.addEventListener("selectShapeImage",onSelectShapeImage);
 			_mainUi.addEventListener("selectComponents",onSelectComponents);
+			
+			_mainUi.addEventListener("selectComponents",onSelectComponents);
+			
 			addChild(_mainUi);
 			
 			_movieClipProUi = new MovieClipPropertyUi();
@@ -99,6 +103,10 @@ package lzm.starling.swf.tool
 			hidePropertyPanel();
 			
 			_starlingStarup.clear();
+		}
+		
+		private function onIsDrag(e:UIEvent):void{
+			_starlingStarup.setDrag(e.data.value);
 		}
 		
 		/**
