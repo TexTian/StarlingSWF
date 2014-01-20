@@ -167,7 +167,9 @@ package lzm.starling.swf.tool
 		private function onSelectComponents(e:UIEvent):void{
 			hidePropertyPanel();
 			var component:* = Assets.swf.createComponent(e.data.name);
-			_starlingStarup.showObject(component as DisplayObject);
+			if(component is DisplayObject){
+				_starlingStarup.showObject(component as DisplayObject);
+			}
 		}
 		
 		/**
