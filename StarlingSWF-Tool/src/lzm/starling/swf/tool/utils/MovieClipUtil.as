@@ -25,6 +25,7 @@ package lzm.starling.swf.tool.utils
 			var frameSize:int = mc.totalFrames;
 			var frameInfos:Array = [];
 			var objectCount:Object = {};
+			var childs:Object = {};
 			
 			for (var j:int = 1; j <= frameSize; j++) {
 				mc.gotoAndStop(j);
@@ -36,6 +37,7 @@ package lzm.starling.swf.tool.utils
 				var childName:String;
 				var type:String;
 				var childCount:Object = {};
+				
 				for (var i:int = 0; i < childSize; i++) {
 					child = mc.getChildAt(i) as DisplayObject;
 					childName = getQualifiedClassName(child);
@@ -43,6 +45,26 @@ package lzm.starling.swf.tool.utils
 					if(type == null || type == Swf.dataKey_Componet){
 						continue;
 					}
+					
+					if(type == "text"){
+						childName = type;
+					}
+					
+					if(childCount[childName]){
+						childCount[childName] += 1;
+						
+					}else{
+						childCount[childName] = 1;
+					}
+					
+					if(childs[childName]){
+						if((childs[childName] as Array).indexOf(child) == -1){
+							(childs[childName] as Array).push(child);
+						}
+					}else{
+						childs[childName] = [child];
+					}
+					
 					childInfo = [
 						childName,
 						type,
@@ -61,11 +83,12 @@ package lzm.starling.swf.tool.utils
 						childInfo.push("");
 					}
 					
+					childInfo.push((childs[childName] as Array).indexOf(child));//使用自对象的下标
+					
 					if(type == Swf.dataKey_Scale9 || type == Swf.dataKey_ShapeImg){
 						childInfo.push(Util.formatNumber(child.width));
 						childInfo.push(Util.formatNumber(child.height));
 					}else if(type == "text"){
-						childName = childInfo[0] = type;
 						childInfo.push((child as TextField).width);
 						childInfo.push((child as TextField).height);
 						childInfo.push((child as TextField).defaultTextFormat.font);
@@ -78,20 +101,15 @@ package lzm.starling.swf.tool.utils
 					}
 					
 					childInfos.push(childInfo);
-					
-					if(childCount[childName]){
-						childCount[childName] += 1;
-					}else{
-						childCount[childName] = 1;
-					}
 				}
 				
 				frameInfos.push(childInfos);
 				
 				for(childName in childCount){
-					if(objectCount[childName] == null || objectCount[childName] < childCount[childName]){
-						objectCount[childName] = childCount[childName];
-					}
+					objectCount[childName] = childs[childName].length;
+//					if(objectCount[childName] == null || objectCount[childName] < childCount[childName]){
+//						objectCount[childName] = childCount[childName];
+//					}
 				}
 			}
 			

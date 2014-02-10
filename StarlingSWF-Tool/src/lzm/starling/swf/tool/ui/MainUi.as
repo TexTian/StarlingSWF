@@ -555,7 +555,6 @@ package lzm.starling.swf.tool.ui
 				"shapeImg":Assets.shapeImg,
 				"comp":Assets.components
 			});
-			trace(jsonStr);
 			var swfData:ByteArray = new ByteArray();
 			swfData.writeMultiByte(jsonStr,"utf-8");
 			swfData.compress();
