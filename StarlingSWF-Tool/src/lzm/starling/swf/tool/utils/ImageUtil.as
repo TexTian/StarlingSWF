@@ -2,7 +2,6 @@ package lzm.starling.swf.tool.utils
 {
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
-	import flash.display.MovieClip;
 	import flash.geom.Rectangle;
 	
 	import lzm.starling.swf.tool.Starup;
