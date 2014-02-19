@@ -37,8 +37,8 @@ package lzm.starling.swf.tool.utils
 				childInfo = [
 					childName,
 					type,
-					Util.formatNumber(child.x),
-					Util.formatNumber(child.y),
+					Util.formatNumber(child.x * Util.swfScale),
+					Util.formatNumber(child.y * Util.swfScale),
 					Util.formatNumber(child.scaleX),
 					Util.formatNumber(child.scaleY),
 					MatrixUtil.getSkewX(child.transform.matrix),
@@ -53,8 +53,8 @@ package lzm.starling.swf.tool.utils
 				}
 				
 				if(type == Swf.dataKey_Scale9 || type == Swf.dataKey_ShapeImg){
-					childInfo.push(Util.formatNumber(child.width));
-					childInfo.push(Util.formatNumber(child.height));
+					childInfo.push(Util.formatNumber(child.width * Util.swfScale));
+					childInfo.push(Util.formatNumber(child.height * Util.swfScale));
 				}else if(type == "text"){
 					childName = childInfo[0] = type;
 					childInfo.push((child as TextField).width);

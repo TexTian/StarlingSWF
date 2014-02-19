@@ -9,7 +9,7 @@ package lzm.starling.swf.tool.utils
 	import lzm.starling.swf.Swf;
 	import lzm.starling.swf.tool.Starup;
 	import lzm.starling.swf.tool.asset.Assets;
-
+	
 	/**
 	 * 
 	 * @author zmliu
@@ -49,14 +49,11 @@ package lzm.starling.swf.tool.utils
 					if(type == "text"){
 						childName = type;
 					}
-					
 					if(childCount[childName]){
 						childCount[childName] += 1;
-						
 					}else{
 						childCount[childName] = 1;
 					}
-					
 					if(childs[childName]){
 						if((childs[childName] as Array).indexOf(child) == -1){
 							(childs[childName] as Array).push(child);
@@ -68,8 +65,8 @@ package lzm.starling.swf.tool.utils
 					childInfo = [
 						childName,
 						type,
-						Util.formatNumber(child.x),
-						Util.formatNumber(child.y),
+						Util.formatNumber(child.x * Util.swfScale),
+						Util.formatNumber(child.y * Util.swfScale),
 						Util.formatNumber(child.scaleX),
 						Util.formatNumber(child.scaleY),
 						MatrixUtil.getSkewX(child.transform.matrix),
@@ -86,8 +83,8 @@ package lzm.starling.swf.tool.utils
 					childInfo.push((childs[childName] as Array).indexOf(child));//使用自对象的下标
 					
 					if(type == Swf.dataKey_Scale9 || type == Swf.dataKey_ShapeImg){
-						childInfo.push(Util.formatNumber(child.width));
-						childInfo.push(Util.formatNumber(child.height));
+						childInfo.push(Util.formatNumber(child.width * Util.swfScale));
+						childInfo.push(Util.formatNumber(child.height * Util.swfScale));
 					}else if(type == "text"){
 						childInfo.push((child as TextField).width);
 						childInfo.push((child as TextField).height);
@@ -107,9 +104,6 @@ package lzm.starling.swf.tool.utils
 				
 				for(childName in childCount){
 					objectCount[childName] = childs[childName].length;
-//					if(objectCount[childName] == null || objectCount[childName] < childCount[childName]){
-//						objectCount[childName] = childCount[childName];
-//					}
 				}
 			}
 			

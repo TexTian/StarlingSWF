@@ -145,21 +145,9 @@ package lzm.starling.swf.tool.ui
 			_refreshSwfSource.enabled = true;
 			_exportBtn.enabled = true;
 			
+			Assets.init();
 			Assets.appDomain = loaderinfo.content.loaderInfo.applicationDomain;
 			var clazzKeys:Vector.<String> = Assets.appDomain.getQualifiedDefinitionNames();
-			
-			Assets.imageDatas = {};
-			Assets.spriteDatas = {};
-			Assets.movieClipDatas = {};
-			Assets.buttons = {};
-			Assets.s9s = {};
-			Assets.shapeImg = {};
-			Assets.components = {};
-			
-			if(Assets.asset){
-				Assets.asset.purge();
-			}
-			Assets.asset = new AssetManager(1,false);
 			
 			var images:Array = [];
 			var sprites:Array = [];
