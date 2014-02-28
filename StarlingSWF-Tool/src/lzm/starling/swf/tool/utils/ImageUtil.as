@@ -1,11 +1,12 @@
 package lzm.starling.swf.tool.utils
 {
+	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
 	import flash.geom.Rectangle;
 	
 	import lzm.starling.swf.tool.Starup;
-
+	
 	/**
 	 * 
 	 * @author zmliu
@@ -18,8 +19,14 @@ package lzm.starling.swf.tool.utils
 		 * 获取图片bitmapdata
 		 * */
 		public static function getBitmapdata(clazz:Class,scale:Number):BitmapData{
-			var image:DisplayObject = new clazz();
-			image.scaleX = image.scaleY = scale;
+			var object:Object = new clazz();
+			var image:DisplayObject;
+			if(object is BitmapData){
+				image = new Bitmap(object as BitmapData);
+			}else{
+				image = object as DisplayObject;
+			}
+			image.scaleX = image.scaleY = scale * Util.swfScale;
 			
 			Starup.tempContent.addChild(image);
 			
@@ -50,7 +57,13 @@ package lzm.starling.swf.tool.utils
 		 * 获取图片信息
 		 * */
 		public static function getImageInfo(clazz:Class):Array{
-			var image:DisplayObject = new clazz();
+			var object:Object = new clazz();
+			var image:DisplayObject;
+			if(object is BitmapData){
+				image = new Bitmap(object as BitmapData);
+			}else{
+				image = object as DisplayObject;
+			}
 			
 			Starup.tempContent.addChild(image);
 			
@@ -58,7 +71,7 @@ package lzm.starling.swf.tool.utils
 			
 			Starup.tempContent.removeChild(image);
 			
-			return [Util.formatNumber(-rect.x),Util.formatNumber(-rect.y)];
+			return [Util.formatNumber(-rect.x * Util.swfScale),Util.formatNumber(-rect.y  * Util.swfScale)];
 		}
 		
 	}

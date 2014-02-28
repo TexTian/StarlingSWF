@@ -30,6 +30,19 @@ package lzm.starling.swf.tool.asset
 		public static var swf:Swf;
 		public static var asset:AssetManager;
 		
+		public static function init():void{
+			imageDatas = {};
+			spriteDatas = {};
+			movieClipDatas = {};
+			buttons = {};
+			s9s = {};
+			shapeImg = {};
+			components = {};
+			if(asset){
+				asset.purge();
+			}
+			asset = new AssetManager(1,false);
+		}
 		
 		
 		public static function getClass(clazzName:String):Class{

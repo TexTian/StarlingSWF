@@ -5,7 +5,6 @@ package lzm.starling.swf.tool
 	import flash.events.Event;
 	
 	import lzm.starling.gestures.TapGestures;
-	import lzm.starling.swf.Swf;
 	import lzm.starling.swf.components.ISwfComponent;
 	import lzm.starling.swf.display.SwfMovieClip;
 	import lzm.starling.swf.display.SwfSprite;
@@ -93,7 +92,7 @@ package lzm.starling.swf.tool
 		private function init():void{
 			Starup.stage = stage;
 			Starup.tempContent = new Sprite();
-			Starup.tempContent.x = Starup.tempContent.y = 3000;
+			Starup.tempContent.x = Starup.tempContent.y = 4096;
 			Starup.stage.addChild(Starup.tempContent);
 			
 			Loading.init(stage);

@@ -19,7 +19,12 @@ package lzm.starling.swf.tool.utils
 			
 			Starup.tempContent.removeChild(mc);
 			
-			return [mc.scale9Grid.x - rect.x,mc.scale9Grid.y - rect.y,mc.scale9Grid.width,mc.scale9Grid.height];
+			return [
+				(mc.scale9Grid.x - rect.x) * Util.swfScale,
+				(mc.scale9Grid.y - rect.y) * Util.swfScale,
+				(mc.scale9Grid.width) * Util.swfScale,
+				(mc.scale9Grid.height) * Util.swfScale
+			];
 		}
 	}
 }
