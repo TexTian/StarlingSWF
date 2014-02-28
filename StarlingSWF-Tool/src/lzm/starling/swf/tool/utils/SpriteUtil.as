@@ -41,8 +41,8 @@ package lzm.starling.swf.tool.utils
 					Util.formatNumber(child.y * Util.swfScale),
 					Util.formatNumber(child.scaleX),
 					Util.formatNumber(child.scaleY),
-					MatrixUtil.getSkewX(child.transform.matrix),
-					MatrixUtil.getSkewY(child.transform.matrix),
+					(child.transform.matrix == null) ? 0 : MatrixUtil.getSkewX(child.transform.matrix),
+					(child.transform.matrix == null) ? 0 : MatrixUtil.getSkewY(child.transform.matrix),
 					child.alpha
 				];
 				
