@@ -41,6 +41,8 @@ package lzm.starling.swf.tool.starling
 		
 		private var main:STLMainClass;
 		
+		private var dragGestures:DragGestures;
+		
 		public function StarlingStarup()
 		{
 			super();
@@ -84,9 +86,18 @@ package lzm.starling.swf.tool.starling
 					Swf.init(contentSprite);
 					
 					setTimeout(function():void{
-						new DragGestures(app,onDrag);
-					},1000);
+						dragGestures = new DragGestures(app,onDrag);
+					},300);
 				});
+		}
+		
+		public function setDrag(value:Boolean):void{
+			if(value){
+				dragGestures = new DragGestures(STLConstant.currnetAppRoot,onDrag);
+			}else{
+				dragGestures.dispose();
+				dragGestures = null;
+			}
 		}
 		
 		public function showScale9(name:String):void{

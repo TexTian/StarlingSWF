@@ -10,6 +10,7 @@ package lzm.starling.swf.tool.ui
 	import flash.events.Event;
 	
 	import lzm.starling.swf.components.ISwfComponent;
+	import lzm.starling.swf.components.propertyvalues.ArrayPropertys;
 	import lzm.starling.swf.display.SwfSprite;
 	import lzm.starling.swf.tool.asset.Assets;
 	
@@ -32,7 +33,7 @@ package lzm.starling.swf.tool.ui
 		protected override function loadXMLComplete(e:Event):void{
 			_propertiesSprite = new Sprite();
 			_propertiesSprite.x = 6;
-			_propertiesSprite.y = 78;
+			_propertiesSprite.y = 106;
 			addChild(_propertiesSprite);
 		}
 		
@@ -54,10 +55,14 @@ package lzm.starling.swf.tool.ui
 			var properties:Object = {};
 			
 			var component:Component;
+			var tmpValue:*;
 			for(var key:String in _propertiesComponents){
-				component = _propertiesComponents[key];
-				if(component is ComboBox){
+				tmpValue = _propertiesComponents[key][0];
+				component = _propertiesComponents[key][1];
+				if(tmpValue is Boolean){
 					properties[key] = ((component as ComboBox).selectedIndex == 0) ? true : false;
+				}else if(tmpValue is ArrayPropertys){
+					properties[key] = (component as ComboBox).selectedItem;
 				}else if(component is InputText){
 					if((component as InputText).restrict == "0-9"){
 						properties[key] = int((component as InputText).text);
@@ -94,7 +99,7 @@ package lzm.starling.swf.tool.ui
 				propertyComponent.y = label.y;
 				hbox.addChild(propertyComponent);
 				
-				_propertiesComponents[key] = propertyComponent;
+				_propertiesComponents[key] = [properties[key],propertyComponent];
 				
 				index++;
 			}
@@ -106,6 +111,15 @@ package lzm.starling.swf.tool.ui
 					combobox.items = ["true","false"];
 					combobox.selectedIndex = property ? 0 : 1;
 					component = combobox;
+				}else if(property is ArrayPropertys){
+					var arrayPropertys:ArrayPropertys = property as ArrayPropertys;
+					var selectIndex:int = (arrayPropertys.currentValue == null) ? -1 : arrayPropertys.values.indexOf(arrayPropertys.currentValue);
+					
+					var combobox1:ComboBox = new ComboBox();
+					combobox1.items = arrayPropertys.values;
+					combobox1.selectedIndex = selectIndex;
+					
+					component = combobox1;
 				}else{
 					component = new InputText();
 					(component as InputText).text = property;
@@ -126,7 +140,10 @@ package lzm.starling.swf.tool.ui
 			Assets.putTempData(sprite.spriteName + "-" + index + childInfo[0],editorProperties);
 			
 			_component.editableProperties = editorProperties;
-			
+		}
+		
+		public function onTest(e:Event):void{
+			_component.editableProperties = editorProperties;
 		}
 		
 	}
