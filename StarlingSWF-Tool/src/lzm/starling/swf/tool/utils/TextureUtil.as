@@ -25,10 +25,14 @@
 			
 			var dimensions:uint = 0;
 			var rectList:Vector.<Rectangle> = new Vector.<Rectangle>;
+			var maxHeight:int = 0;
 			for each(rect in rectMap)
 			{
 				dimensions += rect.width * rect.height;
 				rectList.push(rect);
+				if(maxHeight < rect.height){
+					maxHeight = rect.height;
+				}
 			}
 			//sort texture by size
 			rectList.sort(sortRectList);
@@ -40,6 +44,9 @@
 			}
 			
 			widthDefault = getNearest2N(Math.max(int(rectList[0].width) + padding, widthDefault));
+			if(widthDefault < maxHeight){
+				widthDefault *= 2;
+			}
 			
 			var heightMax:uint = HIGHEST;
 			var remainAreaList:Vector.<Rectangle> = new Vector.<Rectangle>;
