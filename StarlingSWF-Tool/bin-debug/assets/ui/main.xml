@@ -44,7 +44,7 @@
 					<ComboBox id="ComponentsComboBox" width="180" enabled="false" event="select:onSelectComponents" />
 				</HBox>
 			</HBox>
-			<HBox spacing="24">
+			<HBox spacing="16">
 				<HBox>
 					<Label text="背景颜色:"/>
 					<ColorChooser id="bgColor" usePopup="true" value="0x999999" event="change:onColorChange" />
@@ -54,6 +54,10 @@
 					<CheckBox id="isDrag" selected="true" event="click:onIsDrag"/>
 				</HBox>
 				<HUISlider label="Swf帧率:" id="fpsValue" value="24" maximum="60" minimum="24" event="change:onFpsChange"/>
+				<HBox>
+					<Label text="swf倒入倍数:"/>
+					<InputText id="swfScale" text="1" width="50" />
+				</HBox>
 				<PushButton id="exportBtn" label="导出" event="click:onExportBtn" enabled="false"/>
 				<Label id="versionText"/>
 			</HBox>
