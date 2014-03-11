@@ -38,7 +38,6 @@ package lzm.starling.swf.tool.ui
 	
 	import starling.core.Starling;
 	import starling.textures.Texture;
-	import starling.utils.AssetManager;
 	
 	
 	/**
@@ -138,6 +137,8 @@ package lzm.starling.swf.tool.ui
 		 * */
 		private function loadSwfComplete(e:Event):void{
 			Loading.instance.hide();
+			
+			Util.swfScale = Number((uiConfig.getCompById("swfScale") as InputText).text);
 			
 			var loaderinfo:LoaderInfo = e.target as LoaderInfo;
 			loaderinfo.removeEventListener(Event.COMPLETE,loadSwfComplete);

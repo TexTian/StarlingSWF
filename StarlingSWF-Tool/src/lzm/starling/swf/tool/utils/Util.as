@@ -17,6 +17,9 @@ package lzm.starling.swf.tool.utils
 		 * */
 		public static function set swfScale(value:Number):void{
 			_swfScale = value;
+			if(isNaN(_swfScale) || _swfScale < 0.000001){
+				_swfScale = 1;
+			}
 		}
 		public static function get swfScale():Number{
 			return _swfScale;
