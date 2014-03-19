@@ -25,9 +25,24 @@ package lzm.starling.swf.tool.asset
 		public static var buttons:Object;
 		public static var s9s:Object;
 		public static var shapeImg:Object;
+		public static var components:Object;
+		
 		public static var swf:Swf;
 		public static var asset:AssetManager;
 		
+		public static function init():void{
+			imageDatas = {};
+			spriteDatas = {};
+			movieClipDatas = {};
+			buttons = {};
+			s9s = {};
+			shapeImg = {};
+			components = {};
+			if(asset){
+				asset.purge();
+			}
+			asset = new AssetManager(1,false);
+		}
 		
 		
 		public static function getClass(clazzName:String):Class{
@@ -36,17 +51,13 @@ package lzm.starling.swf.tool.asset
 		
 		
 		
-		private static var tempFileName:String;
 		private static var tempFileUrl:String;
 		private static var tempMovieClipData:Object;
 		/**
 		 * 打开记录临时数据的文件
 		 * */
-		public static function openTempFile(name:String,callBack:Function):void{
-			
-			tempFileName = name;
-			
-			var file:File = File.applicationStorageDirectory.resolvePath("tmp/"+name);
+		public static function openTempFile(fileName:String,callBack:Function):void{
+			var file:File = new File(fileName.replace(".swf",".data"));
 			tempFileUrl = file.url;
 			if(file.exists){
 				HttpClient.send(tempFileUrl,{},function(data:String):void{

@@ -17,7 +17,8 @@ package
 			stage.color = 0x999999;
 			stage.frameRate = 60;
 			
-			initStarling(StarlingSwfTestMainClass,480,true);
+//			initStarling(TestMainClass,480,true);
+			initStarling(ComponentTestClass,480,true);
 		}
 	}
 }

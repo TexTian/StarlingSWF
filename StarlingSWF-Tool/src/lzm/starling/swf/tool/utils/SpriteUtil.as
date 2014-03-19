@@ -7,6 +7,7 @@ package lzm.starling.swf.tool.utils
 	
 	import lzm.starling.swf.Swf;
 	import lzm.starling.swf.tool.Starup;
+	import lzm.starling.swf.tool.asset.Assets;
 
 	/**
 	 * 
@@ -15,7 +16,7 @@ package lzm.starling.swf.tool.utils
 	 */
 	public class SpriteUtil
 	{
-		public static function getSpriteInfo(clazz:Class):Array{
+		public static function getSpriteInfo(clazzName:String,clazz:Class):Array{
 			var mc:MovieClip = new clazz();
 			
 			Starup.tempContent.addChild(mc);
@@ -36,12 +37,12 @@ package lzm.starling.swf.tool.utils
 				childInfo = [
 					childName,
 					type,
-					Util.formatNumber(child.x),
-					Util.formatNumber(child.y),
+					Util.formatNumber(child.x * Util.swfScale),
+					Util.formatNumber(child.y * Util.swfScale),
 					Util.formatNumber(child.scaleX),
 					Util.formatNumber(child.scaleY),
-					MatrixUtil.getSkewX(child.transform.matrix),
-					MatrixUtil.getSkewY(child.transform.matrix),
+					(child.transform.matrix == null) ? 0 : MatrixUtil.getSkewX(child.transform.matrix),
+					(child.transform.matrix == null) ? 0 : MatrixUtil.getSkewY(child.transform.matrix),
 					child.alpha
 				];
 				
@@ -52,8 +53,8 @@ package lzm.starling.swf.tool.utils
 				}
 				
 				if(type == Swf.dataKey_Scale9 || type == Swf.dataKey_ShapeImg){
-					childInfo.push(Util.formatNumber(child.width));
-					childInfo.push(Util.formatNumber(child.height));
+					childInfo.push(Util.formatNumber(child.width * Util.swfScale));
+					childInfo.push(Util.formatNumber(child.height * Util.swfScale));
 				}else if(type == "text"){
 					childName = childInfo[0] = type;
 					childInfo.push((child as TextField).width);
@@ -65,6 +66,8 @@ package lzm.starling.swf.tool.utils
 					childInfo.push((child as TextField).defaultTextFormat.italic);
 					childInfo.push((child as TextField).defaultTextFormat.bold);
 					childInfo.push((child as TextField).text);
+				}else if(type == Swf.dataKey_Componet){
+					childInfo.push(Assets.getTempData(clazzName + "-" + i + childName));
 				}
 				
 				childInfos.push(childInfo);

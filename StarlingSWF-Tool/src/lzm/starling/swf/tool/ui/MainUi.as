@@ -1,5 +1,6 @@
 package lzm.starling.swf.tool.ui
 {
+	import com.bit101.components.CheckBox;
 	import com.bit101.components.ColorChooser;
 	import com.bit101.components.ComboBox;
 	import com.bit101.components.HUISlider;
@@ -7,7 +8,6 @@ package lzm.starling.swf.tool.ui
 	import com.bit101.components.Label;
 	import com.bit101.components.PushButton;
 	
-	import flash.desktop.NativeApplication;
 	import flash.display.BitmapData;
 	import flash.display.Loader;
 	import flash.display.LoaderInfo;
@@ -20,9 +20,11 @@ package lzm.starling.swf.tool.ui
 	import flash.geom.Rectangle;
 	import flash.net.FileFilter;
 	import flash.net.URLRequest;
+	import flash.net.navigateToURL;
 	import flash.utils.ByteArray;
 	import flash.utils.setTimeout;
 	
+	import lzm.atf.tool.ATFTool;
 	import lzm.starling.swf.Swf;
 	import lzm.starling.swf.tool.asset.Assets;
 	import lzm.starling.swf.tool.utils.ImageUtil;
@@ -32,10 +34,10 @@ package lzm.starling.swf.tool.ui
 	import lzm.starling.swf.tool.utils.SysUtils;
 	import lzm.starling.swf.tool.utils.TextureUtil;
 	import lzm.starling.swf.tool.utils.Util;
+	import lzm.starling.swf.tool.utils.WebUtils;
 	
 	import starling.core.Starling;
 	import starling.textures.Texture;
-	import starling.utils.AssetManager;
 	
 	
 	/**
@@ -55,6 +57,7 @@ package lzm.starling.swf.tool.ui
 		private var _buttonComboBox:ComboBox;
 		private var _s9ComboBox:ComboBox;
 		private var _shapeComboBox:ComboBox;
+		private var _componentsComboBox:ComboBox;
 		
 		private var _bgColorChooser:ColorChooser;
 		private var _fpsValue:HUISlider;
@@ -83,11 +86,15 @@ package lzm.starling.swf.tool.ui
 			_buttonComboBox = uiConfig.getCompById("buttonComboBox") as ComboBox;
 			_s9ComboBox = uiConfig.getCompById("scale9ComboBox") as ComboBox;
 			_shapeComboBox = uiConfig.getCompById("ShapeComboBox") as ComboBox;
+			_componentsComboBox = uiConfig.getCompById("ComponentsComboBox") as ComboBox;
 			
 			_bgColorChooser = uiConfig.getCompById("bgColor") as ColorChooser;
 			_fpsValue = uiConfig.getCompById("fpsValue") as HUISlider;
 			
 			_exportBtn = uiConfig.getCompById("exportBtn") as PushButton;
+			
+			var pushButton:PushButton = uiConfig.getCompById("openTutorials") as PushButton;
+			pushButton.labelComponent.textField.textColor = 0xff0000;
 			
 			(uiConfig.getCompById("versionText") as Label).text = "V"+SysUtils.version;
 		}
@@ -109,8 +116,8 @@ package lzm.starling.swf.tool.ui
 			
 			_swfPath.text = file.url;
 			
-			Assets.openTempFile(Util.getName(_swfPath.text),function():void{
-				loadSwf();
+			Assets.openTempFile(_swfPath.text,function():void{
+				onRefreshSwfSource(null);
 			});
 			
 		}
@@ -131,27 +138,17 @@ package lzm.starling.swf.tool.ui
 		private function loadSwfComplete(e:Event):void{
 			Loading.instance.hide();
 			
+			Util.swfScale = Number((uiConfig.getCompById("swfScale") as InputText).text);
+			
 			var loaderinfo:LoaderInfo = e.target as LoaderInfo;
 			loaderinfo.removeEventListener(Event.COMPLETE,loadSwfComplete);
 			
-			_selectSwfSource.enabled = false;
 			_refreshSwfSource.enabled = true;
 			_exportBtn.enabled = true;
 			
+			Assets.init();
 			Assets.appDomain = loaderinfo.content.loaderInfo.applicationDomain;
 			var clazzKeys:Vector.<String> = Assets.appDomain.getQualifiedDefinitionNames();
-			
-			Assets.imageDatas = {};
-			Assets.spriteDatas = {};
-			Assets.movieClipDatas = {};
-			Assets.buttons = {};
-			Assets.s9s = {};
-			Assets.shapeImg = {};
-			
-			if(Assets.asset){
-				Assets.asset.purge();
-			}
-			Assets.asset = new AssetManager(1,false);
 			
 			var images:Array = [];
 			var sprites:Array = [];
@@ -159,46 +156,43 @@ package lzm.starling.swf.tool.ui
 			var buttons:Array = [];
 			var s9s:Array = [];
 			var shapeImg:Array = [];
+			var components:Array = [];
 			
 			var length:int = clazzKeys.length;
 			var clazzName:String;
+			var childType:String;
 			for (var i:int = 0; i < length; i++) {
 				clazzName = clazzKeys[i];
-				if(Util.getChildType(clazzName) == Swf.dataKey_Image){
+				childType = Util.getChildType(clazzName);
+				if(childType == Swf.dataKey_Image){
 					Assets.imageDatas[clazzName] = ImageUtil.getImageInfo(Assets.getClass(clazzName));
 					Assets.asset.addTexture(clazzName,Texture.fromBitmapData(ImageUtil.getBitmapdata(Assets.getClass(clazzName),1)));
 					images.push(clazzName);
-				}else if(Util.getChildType(clazzName) == Swf.dataKey_Sprite){
-					Assets.spriteDatas[clazzName] = SpriteUtil.getSpriteInfo(Assets.getClass(clazzName));
+				}else if(childType == Swf.dataKey_Sprite){
+					Assets.spriteDatas[clazzName] = SpriteUtil.getSpriteInfo(clazzName,Assets.getClass(clazzName));
 					sprites.push(clazzName);
-				}else if(Util.getChildType(clazzName) == Swf.dataKey_MovieClip){
+				}else if(childType == Swf.dataKey_MovieClip){
 					Assets.movieClipDatas[clazzName] = MovieClipUtil.getMovieClipInfo(clazzName,Assets.getClass(clazzName));
 					movieClips.push(clazzName);
-				}else if(Util.getChildType(clazzName) == Swf.dataKey_Button){
-					Assets.buttons[clazzName] = SpriteUtil.getSpriteInfo(Assets.getClass(clazzName));
+				}else if(childType == Swf.dataKey_Button){
+					Assets.buttons[clazzName] = SpriteUtil.getSpriteInfo(clazzName,Assets.getClass(clazzName));
 					buttons.push(clazzName);
-				}else if(Util.getChildType(clazzName) == Swf.dataKey_Scale9){
+				}else if(childType == Swf.dataKey_Scale9){
 					Assets.s9s[clazzName] = Scale9Util.getScale9Info(Assets.getClass(clazzName));
 					Assets.asset.addTexture(clazzName,Texture.fromBitmapData(ImageUtil.getBitmapdata(Assets.getClass(clazzName),1)));
 					s9s.push(clazzName);
-				}else if(Util.getChildType(clazzName) == Swf.dataKey_ShapeImg){
+				}else if(childType == Swf.dataKey_ShapeImg){
 					Assets.shapeImg[clazzName] = [];
 					Assets.asset.addTexture(clazzName,Texture.fromBitmapData(ImageUtil.getBitmapdata(Assets.getClass(clazzName),1)));
 					shapeImg.push(clazzName);
+				}else if(childType == Swf.dataKey_Componet){
+					Assets.components[clazzName] = SpriteUtil.getSpriteInfo(clazzName,Assets.getClass(clazzName));
+					components.push(clazzName);
 				}
 			}
 			
-			var swfData:ByteArray = new ByteArray();
-			swfData.writeMultiByte(JSON.stringify({
-				"img":Assets.imageDatas,
-				"spr":Assets.spriteDatas,
-				"mc":Assets.movieClipDatas,
-				"btn":Assets.buttons,
-				"s9":Assets.s9s,
-				"shapeImg":Assets.shapeImg
-			}),"utf-8");
-			swfData.compress();
-			Assets.swf = new Swf(swfData,Assets.asset);
+			
+			Assets.swf = new Swf(getSwfData(),Assets.asset);
 			
 			images.sort();
 			sprites.sort();
@@ -206,12 +200,14 @@ package lzm.starling.swf.tool.ui
 			buttons.sort();
 			s9s.sort();
 			shapeImg.sort();
+			components.sort();
 			
 			_imageComboBox.selectedIndex = -1;
 			_spriteComboBox.selectedIndex = -1;
 			_movieClipComboBox.selectedIndex = -1;
 			_buttonComboBox.selectedIndex = -1;
 			_s9ComboBox.selectedIndex = -1;
+			_componentsComboBox.selectedIndex = -1;
 			
 			if(images.length > 0){
 				_imageComboBox.items = images;
@@ -259,6 +255,14 @@ package lzm.starling.swf.tool.ui
 			}else{
 				_shapeComboBox.items = [];
 				_shapeComboBox.enabled = false;
+			}
+			
+			if(components.length > 0){
+				_componentsComboBox.items =components;
+				_componentsComboBox.enabled = true;
+			}else{
+				_componentsComboBox.items = [];
+				_componentsComboBox.enabled = false;
 			}
 		}
 		
@@ -336,13 +340,36 @@ package lzm.starling.swf.tool.ui
 			}
 		}
 		
+		/**
+		 * 选择一个组件
+		 * */
+		public function onSelectComponents(e:Event):void{
+			if(_componentsComboBox.selectedItem){
+				var event:UIEvent = new UIEvent("selectComponents");
+				event.data = {name:_componentsComboBox.selectedItem};
+				dispatchEvent(event);
+			}
+		}
+		
 		public function onColorChange(e:Event):void{
 			Starling.current.stage.color = stage.color = _bgColorChooser.value;
 		}
 		
+		public function onIsDrag(e:Event):void{
+			var event:UIEvent = new UIEvent("onIsDrag");
+			event.data = {value:(uiConfig.getCompById("isDrag") as CheckBox).selected};
+			dispatchEvent(event);
+		}
+		
 		public function onFpsChange(e:Event):void{
 			Assets.swf.fps = _fpsValue.value;
-//			stage.frameRate = _fpsValue.value;
+		}
+		
+		/**
+		 * 点击了教程按钮
+		 * */
+		public function onOpenTutorials(e:Event):void{
+			navigateToURL(new URLRequest(WebUtils.tutorialsUrl),"_blank");
 		}
 		
 		public function onExportBtn(e:Event):void{
@@ -358,6 +385,7 @@ package lzm.starling.swf.tool.ui
 		
 		private function __export(exportPath:String):void{
 			var swfName:String = Util.getName(_swfPath.text);
+			var mergerImageExportPath:String = exportPath + "/images/";
 			var imageExportPath:String = exportPath + "/images/small/";
 			var bigImageExportPath:String = exportPath + "/images/big/";
 			var dataExportPath:String = exportPath + "/data/" + swfName + ".bytes";
@@ -366,6 +394,10 @@ package lzm.starling.swf.tool.ui
 			images = images.concat(_s9ComboBox.items);
 			images = images.concat(_shapeComboBox.items);
 			var length:int = images.length;
+			if(length == 0){
+				Loading.instance.hide();
+				return;
+			}
 			
 			var bitmapdata:BitmapData;
 			var bitmapdatas:Array = [];
@@ -400,42 +432,43 @@ package lzm.starling.swf.tool.ui
 			
 			if(_exportOption.isMerger){
 				var textureAtlasRect:Rectangle = TextureUtil.packTextures(0,_exportOption.padding,rectMap);
-				var textureAtlasBitmapData:BitmapData = new BitmapData(textureAtlasRect.width,textureAtlasRect.height,true,0);
-				var xml:XML = <TextureAtlas />;
-				var childXml:XML;
-				var imageName:String;
-				var imageRect:Rectangle;
-				
-				var tempRect:Rectangle = new Rectangle();
-				var tempPoint:Point = new Point();
-				
-				length = imageNames.length;
-				for (i = 0; i < length; i++) {
-					imageName = imageNames[i];
-					imageRect = rectMap[imageName];
-					bitmapdata = bitmapdatas[i];
+				if(textureAtlasRect){
+					var textureAtlasBitmapData:BitmapData = new BitmapData(textureAtlasRect.width,textureAtlasRect.height,true,0);
+					var xml:XML = <TextureAtlas />;
+					var childXml:XML;
+					var imageName:String;
+					var imageRect:Rectangle;
 					
-					tempRect.width = bitmapdata.width;
-					tempRect.height = bitmapdata.height;
-					tempPoint.x = imageRect.x;
-					tempPoint.y = imageRect.y;
+					var tempRect:Rectangle = new Rectangle();
+					var tempPoint:Point = new Point();
 					
-					childXml = <SubTexture />;
-					childXml.@name = imageName;
-					childXml.@x = tempPoint.x;
-					childXml.@y = tempPoint.y;
-					childXml.@width = tempRect.width;
-					childXml.@height = tempRect.height;
-					xml.appendChild(childXml);
+					length = imageNames.length;
+					for (i = 0; i < length; i++) {
+						imageName = imageNames[i];
+						imageRect = rectMap[imageName];
+						bitmapdata = bitmapdatas[i];
+						
+						tempRect.width = bitmapdata.width;
+						tempRect.height = bitmapdata.height;
+						tempPoint.x = imageRect.x;
+						tempPoint.y = imageRect.y;
+						
+						childXml = <SubTexture />;
+						childXml.@name = imageName;
+						childXml.@x = tempPoint.x;
+						childXml.@y = tempPoint.y;
+						childXml.@width = tempRect.width;
+						childXml.@height = tempRect.height;
+						xml.appendChild(childXml);
+						
+						textureAtlasBitmapData.copyPixels(bitmapdata,tempRect,tempPoint);
+					}
 					
-					textureAtlasBitmapData.copyPixels(bitmapdata,tempRect,tempPoint);
+					saveImage(mergerImageExportPath + swfName + ".png",textureAtlasBitmapData);
+					
+					xml.@imagePath = swfName + ".png";
+					saveXml(mergerImageExportPath + swfName + ".xml",xml.toXMLString());
 				}
-				
-				saveImage(imageExportPath + swfName + ".png",textureAtlasBitmapData);
-				
-				xml.@imagePath = swfName + ".png";
-				saveXml(imageExportPath + swfName + ".xml",xml.toXMLString());
-				
 			}else{
 				//小图导出
 				length = imageNames.length;
@@ -494,23 +527,40 @@ package lzm.starling.swf.tool.ui
 		}
 		//保存swf数据
 		private function saveSwfData(dataExportPath:String):void{
-			var swfData:ByteArray = new ByteArray();
-			swfData.writeMultiByte(JSON.stringify({
+			var file:File = new File(dataExportPath);
+			var fs:FileStream = new FileStream();
+			fs.open(file,FileMode.WRITE);
+			fs.writeBytes(getSwfData());
+			fs.close();
+		}
+		
+		private function getSwfData():ByteArray{
+			var jsonStr:String = JSON.stringify({
 				"img":Assets.imageDatas,
 				"spr":Assets.spriteDatas,
 				"mc":Assets.movieClipDatas,
 				"btn":Assets.buttons,
 				"s9":Assets.s9s,
-				"shapeImg":Assets.shapeImg
-			}),"utf-8");
+				"shapeImg":Assets.shapeImg,
+				"comp":Assets.components
+			});
+			var swfData:ByteArray = new ByteArray();
+			swfData.writeMultiByte(jsonStr,"utf-8");
 			swfData.compress();
-			var file:File = new File(dataExportPath);
-			var fs:FileStream = new FileStream();
-			fs.open(file,FileMode.WRITE);
-			fs.writeBytes(swfData);
-			fs.close();
+			
+			return swfData;
 		}
 		
+		
+		//--------------以下为友情工具---------------//
+		
+		private var _atfTool:ATFTool;
+		public function onOpenAtfTool(e:Event):void{
+			if(_atfTool == null){
+				_atfTool = new ATFTool();
+			}
+			addChild(_atfTool);
+		}
 		
 	}
 }

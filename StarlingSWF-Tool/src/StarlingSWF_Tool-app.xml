@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
-<application xmlns="http://ns.adobe.com/air/application/3.9">
+<application xmlns="http://ns.adobe.com/air/application/4.0">
 	<id>com.lzm.StarlingSwf</id>
 	<filename>StarlingSwf</filename>
 	<name>StarlingSwf</name>
-	<versionNumber>0.0.5</versionNumber>
+	<versionNumber>0.0.8</versionNumber>
 	<initialWindow>
 		<content>[此值将由 Flash Builder 在输出 app.xml 中覆盖]</content>
 		<!-- <systemChrome></systemChrome> -->
@@ -54,4 +54,7 @@
 		<image732x412></image732x412>
 		<image1024x1024></image1024x1024>-->
 	</icon> 
+	
+	<supportedProfiles>extendedDesktop</supportedProfiles>
+	
 </application>

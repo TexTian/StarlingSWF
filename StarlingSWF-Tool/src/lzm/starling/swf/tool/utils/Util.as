@@ -10,6 +10,21 @@ package lzm.starling.swf.tool.utils
 	 */
 	public class Util
 	{
+		
+		private static var _swfScale:Number = 1;
+		/**
+		 * 设置获取swf的缩放倍数
+		 * */
+		public static function set swfScale(value:Number):void{
+			_swfScale = value;
+			if(isNaN(_swfScale) || _swfScale < 0.000001){
+				_swfScale = 1;
+			}
+		}
+		public static function get swfScale():Number{
+			return _swfScale;
+		}
+		
 		/**
 		 * 保留两位小数
 		 */		
@@ -21,8 +36,8 @@ package lzm.starling.swf.tool.utils
 		 * 返回子集类型
 		 * */
 		public static function getChildType(childName:String):String{
-			var types:Array = ["img","spr","mc","btn","s9","bat","flash.text::TextField","text","btn","s9","shapeImg"];
-			var types1:Array = ["img","spr","mc","btn","s9","bat","text","text","btn","s9","shapeImg"];
+			var types:Array = ["img","spr","mc","btn","s9","bat","flash.text::TextField","text","btn","s9","shapeImg","comp"];//,"flash.display::Shape","flash.display::Bitmap"
+			var types1:Array = ["img","spr","mc","btn","s9","bat","text","text","btn","s9","shapeImg","comp"];//,"img","img"
 			for (var i:int = 0; i < types.length; i++) {
 				if(childName.indexOf(types[i]) == 0){
 					return types1[i];

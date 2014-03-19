@@ -254,6 +254,10 @@ package com.bit101.components
 			return _toggle;
 		}
 		
+		public function get labelComponent():Label{
+			return _label;
+		}
+		
 		
 	}
 }

@@ -13,6 +13,9 @@ package lzm.starling.swf.tool.utils
 		
 		private static const apiPath:String = "http://zmliu.sinaapp.com/";
 		
+		public static var updateUrl:String = "http://zmliu.github.io/2013/12/17/StarlingSwfToolUpdate/";
+		public static var tutorialsUrl:String = "http://zmliu.github.io/2013/11/09/StarlingSwfTool/";
+		
 		public static function register():void{
 			var registerVersion:String = LSOManager.get("registerVersion");
 			if(registerVersion == SysUtils.version) return;
@@ -37,10 +40,13 @@ package lzm.starling.swf.tool.utils
 			
 			HttpClient.send(apiPath,params,function(data:String):void{
 				var object:Object = JSON.parse(data);
+				updateUrl = object.updateUrl;
+				tutorialsUrl = object.tutorialsUrl;
+				
 				if(object.version != SysUtils.version && object.needUpdate){
-					callBack(true,object.updateUrl);
+					callBack(true);
 				}else{
-					callBack(false,object.updateUrl);
+					callBack(false);
 				}
 			});
 		}
