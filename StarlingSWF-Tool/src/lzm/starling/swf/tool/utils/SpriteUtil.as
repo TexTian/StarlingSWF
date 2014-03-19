@@ -30,7 +30,7 @@ package lzm.starling.swf.tool.utils
 			for (var i:int = 0; i < childSize; i++) {
 				child = mc.getChildAt(i) as DisplayObject;
 				childName = getQualifiedClassName(child);
-				type = Util.getChildType(childName);
+				type = SwfUtil.getChildType(childName);
 				if(type == null){
 					continue;
 				}

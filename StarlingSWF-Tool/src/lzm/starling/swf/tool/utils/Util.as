@@ -32,20 +32,6 @@ package lzm.starling.swf.tool.utils
 			return Math.round(num * (0 || 100)) / 100;
 		}
 		
-		/**
-		 * 返回子集类型
-		 * */
-		public static function getChildType(childName:String):String{
-			var types:Array = ["img","spr","mc","btn","s9","bat","flash.text::TextField","text","btn","s9","shapeImg","comp"];//,"flash.display::Shape","flash.display::Bitmap"
-			var types1:Array = ["img","spr","mc","btn","s9","bat","text","text","btn","s9","shapeImg","comp"];//,"img","img"
-			for (var i:int = 0; i < types.length; i++) {
-				if(childName.indexOf(types[i]) == 0){
-					return types1[i];
-				}
-			}
-			return null;
-		}
-		
 		public static function getName(rawAsset:Object):String
 		{
 			var matches:Array;

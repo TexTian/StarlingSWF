@@ -136,7 +136,7 @@ package lzm.starling.swf.tool.ui
 			
 			childInfo[10] = editorProperties;
 			
-			Assets.spriteDatas[sprite.spriteName][index] = childInfo;
+			Assets.swfUtil.spriteDatas[sprite.spriteName][index] = childInfo;
 			Assets.putTempData(sprite.spriteName + "-" + index + childInfo[0],editorProperties);
 			
 			_component.editableProperties = editorProperties;

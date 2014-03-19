@@ -57,7 +57,7 @@ package lzm.starling.swf.tool.ui
 		public function onChangeLoop(e:Event):void{
 			_movieClip.loop = _isLoop.selected;
 			
-			Assets.movieClipDatas[_movieClip.name]["loop"] = _movieClip.loop;
+			Assets.swfUtil.movieClipDatas[_movieClip.name]["loop"] = _movieClip.loop;
 			Assets.swf.swfData[Swf.dataKey_MovieClip][_movieClip.name]["loop"] = _movieClip.loop;
 			Assets.putTempData(_movieClip.name,_movieClip.loop);
 		}

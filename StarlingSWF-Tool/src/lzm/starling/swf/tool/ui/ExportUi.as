@@ -11,12 +11,14 @@ package lzm.starling.swf.tool.ui
 	import flash.filesystem.File;
 	
 	import lzm.starling.STLConstant;
+	import lzm.util.LSOManager;
 	
 	public class ExportUi extends BaseUI
 	{
 		private var _window:Window;
 		private var _exportScale:NumericStepper;
 		private var _isMerger:CheckBox;
+		private var _isBat:CheckBox;
 		private var _paddingValue:NumericStepper;
 		private var _isMergerBigImage:CheckBox;
 		private var _bigImageWidth:InputText;
@@ -41,6 +43,7 @@ package lzm.starling.swf.tool.ui
 			_window = uiConfig.getCompById("window") as Window;
 			_exportScale = uiConfig.getCompById("exportScale") as NumericStepper;
 			_isMerger = uiConfig.getCompById("isMerger") as CheckBox;
+			_isBat = uiConfig.getCompById("isBat") as CheckBox;
 			_paddingValue = uiConfig.getCompById("paddingValue") as NumericStepper;
 			_isMergerBigImage = uiConfig.getCompById("isMergerBigImage") as CheckBox;
 			_bigImageWidth = uiConfig.getCompById("bigImageWidth") as InputText;
@@ -74,7 +77,8 @@ package lzm.starling.swf.tool.ui
 		}
 		
 		public function onExport(e:Event):void{
-			var file:File = new File();
+			var oldExportPath:String = LSOManager.get("oldExportPath");
+			var file:File = oldExportPath == null ? new File() : new File(oldExportPath);
 			file.browseForDirectory("输出路径");
 			file.addEventListener(Event.SELECT,selectExportPathOk);
 		}
@@ -88,6 +92,8 @@ package lzm.starling.swf.tool.ui
 			
 			_exportPath = file.url;
 			
+			LSOManager.put("oldExportPath",_exportPath);
+			
 			dispatchEvent(new Event("export"));
 
 			onClose(null);
@@ -98,6 +104,11 @@ package lzm.starling.swf.tool.ui
 		 * */
 		public function get isMerger():Boolean{
 			return _isMerger.selected;
+		}
+		
+		/** 是否批量导出 */
+		public function get isBat():Boolean{
+			return _isBat.selected;
 		}
 		
 		/**
