@@ -9,6 +9,8 @@
 			<HBox>
 				<Label text="合并纹理:"/>
 				<CheckBox id="isMerger" selected="true"/>
+				<Label text="批量导出:"/>
+				<CheckBox id="isBat" selected="false"/>
 			</HBox>
 			<HBox>
 				<Label text="是否合并大图:"/>
@@ -28,8 +30,8 @@
 			</HBox>
 			<PushButton id="exportBtn" label="导出" event="click:onExport"/>
 		</VBox>
-		<Panel x="162" y="8" height="154" width="196" autoHideScrollBar="true">
-			<TextArea id="infoText" width="196" height="154" editable="false">
+		<Panel x="166" y="8" height="154" width="192" autoHideScrollBar="true">
+			<TextArea id="infoText" width="192" height="154" editable="false">
 				
 			</TextArea>
 		</Panel>
