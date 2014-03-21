@@ -8,33 +8,24 @@ package lzm.starling.swf.tool.ui
 	import com.bit101.components.Label;
 	import com.bit101.components.PushButton;
 	
-	import flash.display.BitmapData;
 	import flash.display.Loader;
 	import flash.display.LoaderInfo;
-	import flash.display.PNGEncoderOptions;
 	import flash.events.Event;
 	import flash.filesystem.File;
-	import flash.filesystem.FileMode;
-	import flash.filesystem.FileStream;
-	import flash.geom.Point;
-	import flash.geom.Rectangle;
 	import flash.net.FileFilter;
 	import flash.net.URLRequest;
 	import flash.net.navigateToURL;
-	import flash.utils.ByteArray;
 	import flash.utils.setTimeout;
 	
 	import lzm.atf.tool.ATFTool;
 	import lzm.starling.swf.Swf;
 	import lzm.starling.swf.tool.asset.Assets;
+	import lzm.starling.swf.tool.utils.ExportUtil;
 	import lzm.starling.swf.tool.utils.ImageUtil;
-	import lzm.starling.swf.tool.utils.MovieClipUtil;
-	import lzm.starling.swf.tool.utils.Scale9Util;
-	import lzm.starling.swf.tool.utils.SpriteUtil;
 	import lzm.starling.swf.tool.utils.SysUtils;
-	import lzm.starling.swf.tool.utils.TextureUtil;
 	import lzm.starling.swf.tool.utils.Util;
 	import lzm.starling.swf.tool.utils.WebUtils;
+	import lzm.util.LSOManager;
 	
 	import starling.core.Starling;
 	import starling.textures.Texture;
@@ -50,7 +41,7 @@ package lzm.starling.swf.tool.ui
 		
 		private var _selectSwfSource:PushButton;
 		private var _refreshSwfSource:PushButton;
-		private var _swfPath:InputText;
+		private var _switchSwfComboBox:ComboBox;
 		private var _imageComboBox:ComboBox;
 		private var _spriteComboBox:ComboBox;
 		private var _movieClipComboBox:ComboBox;
@@ -66,6 +57,9 @@ package lzm.starling.swf.tool.ui
 		
 		private var _exportOption:ExportUi;
 		
+		private var _selectFiles:Array;//选中的swf
+		private var _selectFileNames:Array;//选中swf的名字
+		
 		public function MainUi()
 		{
 			super();
@@ -79,7 +73,7 @@ package lzm.starling.swf.tool.ui
 		protected override function loadXMLComplete(e:Event):void{
 			_selectSwfSource = uiConfig.getCompById("selectSwfSource") as PushButton;
 			_refreshSwfSource = uiConfig.getCompById("refreshSwfSource") as PushButton;
-			_swfPath = uiConfig.getCompById("swfSource") as InputText;
+			_switchSwfComboBox = uiConfig.getCompById("switchSwf") as ComboBox;
 			_imageComboBox = uiConfig.getCompById("imageComboBox") as ComboBox;
 			_spriteComboBox = uiConfig.getCompById("spriteComboBox") as ComboBox;
 			_movieClipComboBox = uiConfig.getCompById("movieClipComboBox") as ComboBox;
@@ -103,23 +97,32 @@ package lzm.starling.swf.tool.ui
 		 * 点击选择swf按钮
 		 * */
 		public function onSelectSwfSource(e:Event):void{
-			var file:File = new File();
-			file.browse([new FileFilter("Flash","*.swf")]);
-			file.addEventListener(Event.SELECT,selectSwfOK);
+			var oldSelectFilesPath:String = LSOManager.get("oldSelectFilesPath");
+			var file:File = oldSelectFilesPath == null ? new File() : new File(oldSelectFilesPath);
+			file.browseForOpenMultiple("选择swf",[new FileFilter("Flash","*.swf")]);
+			file.addEventListener("selectMultiple",selectSwfOK);
 		}
 		/**
 		 * 选择完swf
 		 * */
 		private function selectSwfOK(e:Event):void{
-			var file:File = e.target as File;
-			file.removeEventListener(Event.SELECT,selectSwfOK);
+			e.target.removeEventListener(Event.SELECT,selectSwfOK);
+
+			_selectFiles = e["files"];
+			_selectFileNames = [];
 			
-			_swfPath.text = file.url;
+			var len:int = _selectFiles.length;
+			var file:File;
+			for (var i:int = 0; i < len; i++) {
+				file = _selectFiles[i];
+				_selectFileNames.push(file.name.split(".")[0]);
+			}
 			
-			Assets.openTempFile(_swfPath.text,function():void{
-				onRefreshSwfSource(null);
-			});
+			LSOManager.put("oldSelectFilesPath",file.parent.url);
 			
+			_switchSwfComboBox.enabled = true;
+			_switchSwfComboBox.items = _selectFileNames;
+			_switchSwfComboBox.selectedIndex = 0;
 		}
 		
 		/**
@@ -129,7 +132,7 @@ package lzm.starling.swf.tool.ui
 			Loading.instance.show();
 			var loader:Loader = new Loader();
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE,loadSwfComplete);
-			loader.load(new URLRequest(_swfPath.text));
+			loader.load(new URLRequest(currentSelectFileUrl));
 		}
 		
 		/**
@@ -147,60 +150,23 @@ package lzm.starling.swf.tool.ui
 			_exportBtn.enabled = true;
 			
 			Assets.init();
-			Assets.appDomain = loaderinfo.content.loaderInfo.applicationDomain;
-			var clazzKeys:Vector.<String> = Assets.appDomain.getQualifiedDefinitionNames();
+			Assets.swfUtil.parse(loaderinfo.content.loaderInfo.applicationDomain);
+			Assets.swf = new Swf(Assets.swfUtil.getSwfData(),Assets.asset);
 			
-			var images:Array = [];
-			var sprites:Array = [];
-			var movieClips:Array = [];
-			var buttons:Array = [];
-			var s9s:Array = [];
-			var shapeImg:Array = [];
-			var components:Array = [];
-			
-			var length:int = clazzKeys.length;
-			var clazzName:String;
-			var childType:String;
-			for (var i:int = 0; i < length; i++) {
-				clazzName = clazzKeys[i];
-				childType = Util.getChildType(clazzName);
-				if(childType == Swf.dataKey_Image){
-					Assets.imageDatas[clazzName] = ImageUtil.getImageInfo(Assets.getClass(clazzName));
-					Assets.asset.addTexture(clazzName,Texture.fromBitmapData(ImageUtil.getBitmapdata(Assets.getClass(clazzName),1)));
-					images.push(clazzName);
-				}else if(childType == Swf.dataKey_Sprite){
-					Assets.spriteDatas[clazzName] = SpriteUtil.getSpriteInfo(clazzName,Assets.getClass(clazzName));
-					sprites.push(clazzName);
-				}else if(childType == Swf.dataKey_MovieClip){
-					Assets.movieClipDatas[clazzName] = MovieClipUtil.getMovieClipInfo(clazzName,Assets.getClass(clazzName));
-					movieClips.push(clazzName);
-				}else if(childType == Swf.dataKey_Button){
-					Assets.buttons[clazzName] = SpriteUtil.getSpriteInfo(clazzName,Assets.getClass(clazzName));
-					buttons.push(clazzName);
-				}else if(childType == Swf.dataKey_Scale9){
-					Assets.s9s[clazzName] = Scale9Util.getScale9Info(Assets.getClass(clazzName));
-					Assets.asset.addTexture(clazzName,Texture.fromBitmapData(ImageUtil.getBitmapdata(Assets.getClass(clazzName),1)));
-					s9s.push(clazzName);
-				}else if(childType == Swf.dataKey_ShapeImg){
-					Assets.shapeImg[clazzName] = [];
-					Assets.asset.addTexture(clazzName,Texture.fromBitmapData(ImageUtil.getBitmapdata(Assets.getClass(clazzName),1)));
-					shapeImg.push(clazzName);
-				}else if(childType == Swf.dataKey_Componet){
-					Assets.components[clazzName] = SpriteUtil.getSpriteInfo(clazzName,Assets.getClass(clazzName));
-					components.push(clazzName);
-				}
+			var len:int = Assets.swfUtil.exportImages.length;
+			var imageName:String;
+			for (var i:int = 0; i < len; i++) {
+				imageName = Assets.swfUtil.exportImages[i];
+				Assets.asset.addTexture(imageName,Texture.fromBitmapData(ImageUtil.getBitmapdata(Assets.swfUtil.getClass(imageName),1)));
 			}
 			
-			
-			Assets.swf = new Swf(getSwfData(),Assets.asset);
-			
-			images.sort();
-			sprites.sort();
-			movieClips.sort();
-			buttons.sort();
-			s9s.sort();
-			shapeImg.sort();
-			components.sort();
+			Assets.swfUtil.imageNames.sort();
+			Assets.swfUtil.spriteNames.sort();
+			Assets.swfUtil.movieClipNames.sort();
+			Assets.swfUtil.buttonNames.sort();
+			Assets.swfUtil.s9Names.sort();
+			Assets.swfUtil.shapeImgNames.sort();
+			Assets.swfUtil.componentNames.sort();
 			
 			_imageComboBox.selectedIndex = -1;
 			_spriteComboBox.selectedIndex = -1;
@@ -209,56 +175,56 @@ package lzm.starling.swf.tool.ui
 			_s9ComboBox.selectedIndex = -1;
 			_componentsComboBox.selectedIndex = -1;
 			
-			if(images.length > 0){
-				_imageComboBox.items = images;
+			if(Assets.swfUtil.imageNames.length > 0){
+				_imageComboBox.items = Assets.swfUtil.imageNames;
 				_imageComboBox.enabled = true;
 			}else{
 				_imageComboBox.items = [];
 				_imageComboBox.enabled = false;
 			}
 			
-			if(sprites.length > 0){
-				_spriteComboBox.items = sprites;
+			if(Assets.swfUtil.spriteNames.length > 0){
+				_spriteComboBox.items = Assets.swfUtil.spriteNames;
 				_spriteComboBox.enabled = true;
 			}else{
 				_spriteComboBox.items = [];
 				_spriteComboBox.enabled = false;
 			}
 			
-			if(movieClips.length > 0){
-				_movieClipComboBox.items = movieClips;
+			if(Assets.swfUtil.movieClipNames.length > 0){
+				_movieClipComboBox.items = Assets.swfUtil.movieClipNames;
 				_movieClipComboBox.enabled = true;
 			}else{
 				_movieClipComboBox.items = [];
 				_movieClipComboBox.enabled = false;
 			}
 			
-			if(buttons.length > 0){
-				_buttonComboBox.items = buttons;
+			if(Assets.swfUtil.buttonNames.length > 0){
+				_buttonComboBox.items = Assets.swfUtil.buttonNames;
 				_buttonComboBox.enabled = true;
 			}else{
 				_buttonComboBox.items = [];
 				_buttonComboBox.enabled = false;
 			}
 			
-			if(s9s.length > 0){
-				_s9ComboBox.items = s9s;
+			if(Assets.swfUtil.s9Names.length > 0){
+				_s9ComboBox.items = Assets.swfUtil.s9Names;
 				_s9ComboBox.enabled = true;
 			}else{
 				_s9ComboBox.items = [];
 				_s9ComboBox.enabled = false;
 			}
 			
-			if(shapeImg.length > 0){
-				_shapeComboBox.items =shapeImg;
+			if(Assets.swfUtil.shapeImgNames.length > 0){
+				_shapeComboBox.items = Assets.swfUtil.shapeImgNames;
 				_shapeComboBox.enabled = true;
 			}else{
 				_shapeComboBox.items = [];
 				_shapeComboBox.enabled = false;
 			}
 			
-			if(components.length > 0){
-				_componentsComboBox.items =components;
+			if(Assets.swfUtil.componentNames.length > 0){
+				_componentsComboBox.items =Assets.swfUtil.componentNames;
 				_componentsComboBox.enabled = true;
 			}else{
 				_componentsComboBox.items = [];
@@ -272,6 +238,15 @@ package lzm.starling.swf.tool.ui
 		public function onRefreshSwfSource(e:Event):void{
 			dispatchEvent(new UIEvent("onRefresh"));
 			loadSwf();
+		}
+		
+		/**
+		 * 切换swf
+		 * */
+		public function onSwitchSwf(e:Event):void{
+			Assets.openTempFile(currentSelectFileUrl,function():void{
+				onRefreshSwfSource(null);
+			});
 		}
 		
 		/**
@@ -376,179 +351,49 @@ package lzm.starling.swf.tool.ui
 			stage.addChild(_exportOption);
 		}
 		
+		/** 当前选中的swf名字 */
+		private function get currentSelectFileName():String{
+			return _selectFileNames[_switchSwfComboBox.selectedIndex];
+		}
+		/** 当前选中的swf的地址 */
+		private function get currentSelectFileUrl():String{
+			return _selectFiles[_switchSwfComboBox.selectedIndex].url;
+		}
+		/** 当前选中的swf */
+		private function get currentSelectFile():File{
+			return _selectFiles[_switchSwfComboBox.selectedIndex];
+		}
+		
 		private function export(e:Event):void{
 			Loading.instance.show();
+			
+			Util.swfScale = Number((uiConfig.getCompById("swfScale") as InputText).text);
+			
 			setTimeout(function():void{
-				__export(_exportOption.exportPath);
+				var exportFiles:Array = [];
+				if(_exportOption.isBat){
+					for each (var file:File in _selectFiles) {
+						exportFiles.push(file);
+					}
+				}else{
+					exportFiles.push(currentSelectFile);
+				}
+				new ExportUtil().exportFiles(
+					exportFiles,
+					_exportOption.exportScale,
+					_exportOption.isMerger,
+					_exportOption.isMergerBigImage,
+					_exportOption.padding,
+					_exportOption.exportPath,
+					_exportOption.bigImageWidth,
+					_exportOption.bigImageHeight,
+					exportOver
+				);
 			},30);
-		}
-		
-		private function __export(exportPath:String):void{
-			var swfName:String = Util.getName(_swfPath.text);
-			var mergerImageExportPath:String = exportPath + "/images/";
-			var imageExportPath:String = exportPath + "/images/small/";
-			var bigImageExportPath:String = exportPath + "/images/big/";
-			var dataExportPath:String = exportPath + "/data/" + swfName + ".bytes";
 			
-			var images:Array = _imageComboBox.items;
-			images = images.concat(_s9ComboBox.items);
-			images = images.concat(_shapeComboBox.items);
-			var length:int = images.length;
-			if(length == 0){
+			function exportOver():void{
 				Loading.instance.hide();
-				return;
 			}
-			
-			var bitmapdata:BitmapData;
-			var bitmapdatas:Array = [];
-			var bigBitmapDatas:Array = [];
-			
-			var imageNames:Array = [];
-			var bigImageNames:Array = [];
-			var rectMap:Object = {};
-			
-			var i:int;
-			for (i = 0; i < length; i++) {
-				bitmapdata = ImageUtil.getBitmapdata(Assets.getClass(images[i]),_exportOption.exportScale);
-				if(_exportOption.isMerger){//合并纹理
-					if(isBigImage(bitmapdata) && !_exportOption.isMergerBigImage){
-						bigImageNames.push(images[i]);
-						bigBitmapDatas.push(bitmapdata);
-					}else{
-						bitmapdatas.push(bitmapdata);
-						imageNames.push(images[i]);
-						rectMap[images[i]] = new Rectangle(0,0,bitmapdata.width,bitmapdata.height);
-					}
-				}else{//不合并
-					if(isBigImage(bitmapdata)){
-						bigImageNames.push(images[i]);
-						bigBitmapDatas.push(bitmapdata);
-					}else{
-						imageNames.push(images[i]);
-						bitmapdatas.push(bitmapdata);
-					}
-				}
-			}
-			
-			if(_exportOption.isMerger){
-				var textureAtlasRect:Rectangle = TextureUtil.packTextures(0,_exportOption.padding,rectMap);
-				if(textureAtlasRect){
-					var textureAtlasBitmapData:BitmapData = new BitmapData(textureAtlasRect.width,textureAtlasRect.height,true,0);
-					var xml:XML = <TextureAtlas />;
-					var childXml:XML;
-					var imageName:String;
-					var imageRect:Rectangle;
-					
-					var tempRect:Rectangle = new Rectangle();
-					var tempPoint:Point = new Point();
-					
-					length = imageNames.length;
-					for (i = 0; i < length; i++) {
-						imageName = imageNames[i];
-						imageRect = rectMap[imageName];
-						bitmapdata = bitmapdatas[i];
-						
-						tempRect.width = bitmapdata.width;
-						tempRect.height = bitmapdata.height;
-						tempPoint.x = imageRect.x;
-						tempPoint.y = imageRect.y;
-						
-						childXml = <SubTexture />;
-						childXml.@name = imageName;
-						childXml.@x = tempPoint.x;
-						childXml.@y = tempPoint.y;
-						childXml.@width = tempRect.width;
-						childXml.@height = tempRect.height;
-						xml.appendChild(childXml);
-						
-						textureAtlasBitmapData.copyPixels(bitmapdata,tempRect,tempPoint);
-					}
-					
-					saveImage(mergerImageExportPath + swfName + ".png",textureAtlasBitmapData);
-					
-					xml.@imagePath = swfName + ".png";
-					saveXml(mergerImageExportPath + swfName + ".xml",xml.toXMLString());
-				}
-			}else{
-				//小图导出
-				length = imageNames.length;
-				for (i = 0; i < length; i++) {
-					saveImage(imageExportPath + imageNames[i] + ".png",bitmapdatas[i]);
-				}
-			}
-			
-			//大图导出
-			length = bigImageNames.length;
-			for (i = 0; i < length; i++) {
-				saveImage(bigImageExportPath + bigImageNames[i] + ".png",bigBitmapDatas[i]);
-			}
-			
-			//保存swf数据
-			saveSwfData(dataExportPath);
-			
-			Loading.instance.hide();
-		}
-		
-		//是否是大纹理
-		private function isBigImage(bitmapdata:BitmapData):Boolean{
-			if(
-				bitmapdata.width > (_exportOption.bigImageWidth * _exportOption.exportScale) && 
-				bitmapdata.height > (_exportOption.bigImageHeight * _exportOption.exportScale)
-			){
-				return true;
-			}
-			return false;
-		}
-		
-		//保存图片
-		private function saveImage(path:String,bitmapdata:BitmapData):void{
-			try{
-				var bytes:ByteArray = bitmapdata.encode(new Rectangle(0,0,bitmapdata.width,bitmapdata.height),new PNGEncoderOptions());
-				var file:File = new File(path);
-				var fs:FileStream = new FileStream();
-				fs.open(file,FileMode.WRITE);
-				fs.writeBytes(bytes);
-				fs.close();
-			} 
-			catch(error:Error) {
-				trace(path);
-			}
-			
-		}
-		//保存xml
-		private function saveXml(path:String,data:String):void{
-			var bytes:ByteArray = new ByteArray();
-			bytes.writeMultiByte(data,"utf-8");
-			var file:File = new File(path);
-			var fs:FileStream = new FileStream();
-			fs.open(file,FileMode.WRITE);
-			fs.writeBytes(bytes);
-			fs.close();
-		}
-		//保存swf数据
-		private function saveSwfData(dataExportPath:String):void{
-			var file:File = new File(dataExportPath);
-			var fs:FileStream = new FileStream();
-			fs.open(file,FileMode.WRITE);
-			fs.writeBytes(getSwfData());
-			fs.close();
-		}
-		
-		private function getSwfData():ByteArray{
-			var jsonStr:String = JSON.stringify({
-				"img":Assets.imageDatas,
-				"spr":Assets.spriteDatas,
-				"mc":Assets.movieClipDatas,
-				"btn":Assets.buttons,
-				"s9":Assets.s9s,
-				"shapeImg":Assets.shapeImg,
-				"comp":Assets.components
-			});
-			var swfData:ByteArray = new ByteArray();
-			swfData.writeMultiByte(jsonStr,"utf-8");
-			swfData.compress();
-			
-			return swfData;
 		}
 		
 		

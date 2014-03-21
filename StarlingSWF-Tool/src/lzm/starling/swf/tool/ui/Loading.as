@@ -1,12 +1,11 @@
 package lzm.starling.swf.tool.ui
 {
 	import com.bit101.components.Label;
-	import com.bit101.components.ProgressBar;
-	import com.bit101.components.VBox;
 	
 	import flash.display.Sprite;
 	import flash.display.Stage;
-	import flash.events.Event;
+	import flash.text.TextField;
+	import flash.text.TextFormat;
 
 	/**
 	 * 
@@ -32,7 +31,7 @@ package lzm.starling.swf.tool.ui
 		}
 		
 		
-		private var _label:Label;
+		private var _label:TextField;
 		private var _sprite:Sprite;
 		
 		public function Loading()
@@ -45,20 +44,26 @@ package lzm.starling.swf.tool.ui
 			_sprite.graphics.endFill();
 			addChild(_sprite);
 			
-			_label = new Label(this,0,0,"Loading...");
+			_label = new TextField();
+			_label.defaultTextFormat = new TextFormat("PF Ronda Seven",12,0xFFFFFF);
+			addChild(_label);
 		}
 		
 		public function show():void{
-			var w:Number = _stage.stageWidth;
-			var h:Number = _stage.stageHeight;
+			_sprite.width = _stage.stageWidth;
+			_sprite.height = _stage.stageHeight;
 			
-			_sprite.width = w;
-			_sprite.height = h;
-			
-			_label.x = (w - _label.width)/2;
-			_label.y = (h - _label.height)/2;
+			_label.text = "Loading...";
+			_label.x = (_stage.stageWidth - _label.width)/2;
+			_label.y = (_stage.stageHeight - _label.height)/2;
 			
 			_stage.addChild(this);
+		}
+		
+		public function set text(value:String):void{
+			_label.text = value;
+			_label.x = (_stage.stageWidth - _label.width)/2;
+			_label.y = (_stage.stageHeight - _label.height)/2;
 		}
 		
 		public function hide():void{

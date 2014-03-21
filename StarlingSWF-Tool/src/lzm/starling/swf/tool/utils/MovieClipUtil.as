@@ -41,7 +41,7 @@ package lzm.starling.swf.tool.utils
 				for (var i:int = 0; i < childSize; i++) {
 					child = mc.getChildAt(i) as DisplayObject;
 					childName = getQualifiedClassName(child);
-					type = Util.getChildType(childName);
+					type = SwfUtil.getChildType(childName);
 					if(type == null || type == Swf.dataKey_Componet){
 						continue;
 					}
@@ -65,10 +65,10 @@ package lzm.starling.swf.tool.utils
 					childInfo = [
 						childName,
 						type,
-						Util.formatNumber(child.x * Util.swfScale),
-						Util.formatNumber(child.y * Util.swfScale),
-						Util.formatNumber(child.scaleX),
-						Util.formatNumber(child.scaleY),
+						child.x * Util.swfScale,
+						child.y * Util.swfScale,
+						child.scaleX,
+						child.scaleY,
 						MatrixUtil.getSkewX(child.transform.matrix),
 						MatrixUtil.getSkewY(child.transform.matrix),
 						child.alpha
@@ -108,7 +108,7 @@ package lzm.starling.swf.tool.utils
 			}
 			
 			for(var key:String in objectCount){
-				objectCount[key] = [Util.getChildType(key),objectCount[key]];
+				objectCount[key] = [SwfUtil.getChildType(key),objectCount[key]];
 			}
 			
 			var frameLabels:Array = mc.currentLabels;

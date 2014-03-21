@@ -3,7 +3,7 @@
 	<id>com.lzm.StarlingSwf</id>
 	<filename>StarlingSwf</filename>
 	<name>StarlingSwf</name>
-	<versionNumber>0.0.8</versionNumber>
+	<versionNumber>0.0.9</versionNumber>
 	<initialWindow>
 		<content>[此值将由 Flash Builder 在输出 app.xml 中覆盖]</content>
 		<!-- <systemChrome></systemChrome> -->

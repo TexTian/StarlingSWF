@@ -3,10 +3,10 @@ package lzm.starling.swf.tool.asset
 	import flash.filesystem.File;
 	import flash.filesystem.FileMode;
 	import flash.filesystem.FileStream;
-	import flash.system.ApplicationDomain;
 	import flash.utils.ByteArray;
 	
 	import lzm.starling.swf.Swf;
+	import lzm.starling.swf.tool.utils.SwfUtil;
 	import lzm.util.HttpClient;
 	
 	import starling.utils.AssetManager;
@@ -18,37 +18,18 @@ package lzm.starling.swf.tool.asset
 	 */
 	public class Assets
 	{
-		public static var appDomain:ApplicationDomain;
-		public static var imageDatas:Object;
-		public static var spriteDatas:Object;
-		public static var movieClipDatas:Object;
-		public static var buttons:Object;
-		public static var s9s:Object;
-		public static var shapeImg:Object;
-		public static var components:Object;
+		public static var swfUtil:SwfUtil;
 		
 		public static var swf:Swf;
 		public static var asset:AssetManager;
 		
 		public static function init():void{
-			imageDatas = {};
-			spriteDatas = {};
-			movieClipDatas = {};
-			buttons = {};
-			s9s = {};
-			shapeImg = {};
-			components = {};
+			swfUtil = new SwfUtil();
 			if(asset){
 				asset.purge();
 			}
 			asset = new AssetManager(1,false);
 		}
-		
-		
-		public static function getClass(clazzName:String):Class{
-			return appDomain.getDefinition(clazzName) as Class;
-		}
-		
 		
 		
 		private static var tempFileUrl:String;
