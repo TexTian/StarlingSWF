@@ -65,10 +65,10 @@ package lzm.starling.swf.tool.utils
 					childInfo = [
 						childName,
 						type,
-						Util.formatNumber(child.x * Util.swfScale),
-						Util.formatNumber(child.y * Util.swfScale),
-						Util.formatNumber(child.scaleX),
-						Util.formatNumber(child.scaleY),
+						child.x * Util.swfScale,
+						child.y * Util.swfScale,
+						child.scaleX,
+						child.scaleY,
 						MatrixUtil.getSkewX(child.transform.matrix),
 						MatrixUtil.getSkewY(child.transform.matrix),
 						child.alpha
